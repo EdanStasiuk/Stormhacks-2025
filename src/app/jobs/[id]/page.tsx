@@ -1,0 +1,251 @@
+"use client";
+
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import CandidateCard from "@/components/CandidateCard";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { ArrowLeft, ArrowUpDown } from "lucide-react";
+
+// Mock data - replace with actual API calls
+const mockJob = {
+  id: "1",
+  title: "Senior Frontend Developer",
+  description: "We are looking for an experienced frontend developer...",
+  candidateCount: 45,
+  status: "active",
+  createdAt: "2025-10-01",
+};
+
+const mockCandidates = [
+  {
+    id: "1",
+    name: "Alice Johnson",
+    email: "alice@example.com",
+    overallScore: 95,
+    skillScore: 98,
+    experienceScore: 92,
+    educationScore: 90,
+    portfolio: "https://alice.dev",
+    resumeUrl: "/resumes/alice.pdf",
+    insights: "Strong React and TypeScript experience. 5+ years in frontend development.",
+  },
+  {
+    id: "2",
+    name: "Bob Smith",
+    email: "bob@example.com",
+    overallScore: 88,
+    skillScore: 85,
+    experienceScore: 90,
+    educationScore: 88,
+    portfolio: "https://bobsmith.com",
+    resumeUrl: "/resumes/bob.pdf",
+    insights: "Solid Vue.js background. Previous experience at FAANG companies.",
+  },
+  {
+    id: "3",
+    name: "Carol Davis",
+    email: "carol@example.com",
+    overallScore: 82,
+    skillScore: 80,
+    experienceScore: 85,
+    educationScore: 80,
+    portfolio: null,
+    resumeUrl: "/resumes/carol.pdf",
+    insights: "Good fundamentals. Strong UI/UX focus with design background.",
+  },
+];
+
+export default function JobDetail() {
+  const params = useParams();
+  const router = useRouter();
+  const [candidates, setCandidates] = useState(mockCandidates);
+  const [sortBy, setSortBy] = useState<"overall" | "skills" | "experience">("overall");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+
+  const sortedCandidates = [...candidates].sort((a, b) => {
+    if (sortBy === "overall") return b.overallScore - a.overallScore;
+    if (sortBy === "skills") return b.skillScore - a.skillScore;
+    if (sortBy === "experience") return b.experienceScore - a.experienceScore;
+    return 0;
+  });
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b backdrop-blur-sm bg-card/50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                  {mockJob.title}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {mockJob.candidateCount} candidates screened
+                </p>
+              </div>
+            </div>
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8">
+        {/* Job Info */}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle>Job Details</CardTitle>
+                <CardDescription>{mockJob.description}</CardDescription>
+              </div>
+              <Badge variant={mockJob.status === "active" ? "default" : "secondary"}>
+                {mockJob.status}
+              </Badge>
+            </div>
+          </CardHeader>
+        </Card>
+
+        {/* Filters and Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Sort by:</span>
+            <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="overall">Overall Score</SelectItem>
+                <SelectItem value="skills">Skills Match</SelectItem>
+                <SelectItem value="experience">Experience</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">View:</span>
+            <Button
+              variant={viewMode === "table" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("table")}
+            >
+              Table
+            </Button>
+            <Button
+              variant={viewMode === "cards" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("cards")}
+            >
+              Cards
+            </Button>
+          </div>
+        </div>
+
+        {/* Candidates Display */}
+        {viewMode === "table" ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Ranked Candidates</CardTitle>
+              <CardDescription>
+                Candidates ranked by AI analysis of resume match to job requirements
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">Rank</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead className="text-center">Overall Score</TableHead>
+                    <TableHead className="text-center">Skills</TableHead>
+                    <TableHead className="text-center">Experience</TableHead>
+                    <TableHead>Portfolio</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedCandidates.map((candidate, index) => (
+                    <TableRow key={candidate.id}>
+                      <TableCell className="font-medium">{index + 1}</TableCell>
+                      <TableCell className="font-medium">{candidate.name}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {candidate.email}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge
+                          variant={
+                            candidate.overallScore >= 90
+                              ? "default"
+                              : candidate.overallScore >= 80
+                                ? "secondary"
+                                : "outline"
+                          }
+                        >
+                          {candidate.overallScore}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center">{candidate.skillScore}</TableCell>
+                      <TableCell className="text-center">{candidate.experienceScore}</TableCell>
+                      <TableCell>
+                        {candidate.portfolio ? (
+                          <a
+                            href={candidate.portfolio}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline text-sm"
+                          >
+                            View
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">N/A</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Link href={`/candidates/${candidate.id}`}>
+                          <Button variant="outline" size="sm">
+                            View Details
+                          </Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {sortedCandidates.map((candidate, index) => (
+              <CandidateCard key={candidate.id} candidate={candidate} rank={index + 1} />
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
