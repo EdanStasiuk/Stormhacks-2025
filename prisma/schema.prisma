@@ -1,0 +1,55 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+}
+
+model Job {
+    id          String      @id @default(cuid())
+    title       String
+    description String
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+    candidates  Candidate[]
+}
+
+model Candidate {
+    id          String     @id @default(cuid())
+    name        String
+    email       String     @unique
+    skills      String[] // Array of skills
+    experience  String // Experience details
+    education   String // Education details
+    portfolio   Portfolio? @relation(fields: [portfolioId], references: [id])
+    portfolioId String?    @unique
+    resumes     Resume[]
+    jobId       String
+    job         Job        @relation(fields: [jobId], references: [id])
+    score       Float? // Semantic match score
+    createdAt   DateTime   @default(now())
+    updatedAt   DateTime   @updatedAt
+}
+
+model Resume {
+    id          String    @id @default(cuid())
+    fileUrl     String // Supabase storage URL
+    parsedData  Json // Parsed resume data
+    candidateId String
+    candidate   Candidate @relation(fields: [candidateId], references: [id])
+    uploadedAt  DateTime  @default(now())
+}
+
+model Portfolio {
+    id        String     @id @default(cuid())
+    github    String? // GitHub profile link
+    linkedin  String? // LinkedIn profile link
+    website   String? // Personal website link
+    analysis  Json? // AI analysis data
+    candidate Candidate?
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+}
