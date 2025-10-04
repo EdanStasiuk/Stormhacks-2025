@@ -30,11 +30,11 @@ export default function CandidateCard({ candidate, rank }: CandidateCardProps) {
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-all hover:border-primary/40 border-primary/20">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-bold">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full gradient-blue text-white font-bold">
               #{rank}
             </div>
             <div>
@@ -45,7 +45,7 @@ export default function CandidateCard({ candidate, rank }: CandidateCardProps) {
               </div>
             </div>
           </div>
-          <Badge variant={getScoreBadgeVariant(candidate.overallScore)} className="text-lg px-3">
+          <Badge variant={getScoreBadgeVariant(candidate.overallScore)} className="text-lg px-3 bg-primary/10 text-primary border-primary/30">
             {candidate.overallScore}
           </Badge>
         </div>
@@ -79,7 +79,7 @@ export default function CandidateCard({ candidate, rank }: CandidateCardProps) {
         {/* Actions */}
         <div className="flex gap-2">
           <Link href={`/candidates/${candidate.id}`} className="flex-1">
-            <Button variant="default" className="w-full">
+            <Button className="w-full gradient-blue">
               View Full Profile
             </Button>
           </Link>
@@ -90,7 +90,7 @@ export default function CandidateCard({ candidate, rank }: CandidateCardProps) {
               rel="noopener noreferrer"
               className="flex-shrink-0"
             >
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="border-primary/30 hover:bg-primary/10">
                 <ExternalLink className="h-4 w-4" />
               </Button>
             </a>

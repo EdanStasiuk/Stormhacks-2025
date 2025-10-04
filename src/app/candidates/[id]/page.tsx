@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   ArrowLeft,
   Mail,
@@ -84,7 +85,7 @@ export default function CandidateDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
+      <header className="border-b backdrop-blur-sm bg-card/50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -93,13 +94,18 @@ export default function CandidateDetail() {
                 Back
               </Button>
               <div>
-                <h1 className="text-2xl font-bold">{mockCandidate.name}</h1>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                  {mockCandidate.name}
+                </h1>
                 <p className="text-sm text-muted-foreground">{mockCandidate.location}</p>
               </div>
             </div>
-            <Badge variant="default" className="text-lg px-4 py-2">
-              Overall Score: {mockCandidate.overallScore}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge className="text-lg px-4 py-2 gradient-blue">
+                Overall Score: {mockCandidate.overallScore}
+              </Badge>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
@@ -262,7 +268,7 @@ export default function CandidateDetail() {
             </Card>
 
             {/* AI Analysis */}
-            <Card className="border-primary/20">
+            <Card className="gradient-blue-subtle border-primary/30 glow-blue">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary" />
@@ -302,17 +308,17 @@ export default function CandidateDetail() {
             </Card>
 
             {/* Actions */}
-            <Card>
+            <Card className="border-primary/20">
               <CardHeader>
                 <CardTitle>Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button className="w-full">Schedule Interview</Button>
-                <Button variant="outline" className="w-full">
+                <Button className="w-full gradient-blue glow-blue">Schedule Interview</Button>
+                <Button variant="outline" className="w-full border-primary/30 hover:bg-primary/10">
                   <FileText className="h-4 w-4 mr-2" />
                   Download Resume
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full border-primary/30 hover:bg-primary/10">
                   Send Email
                 </Button>
               </CardContent>

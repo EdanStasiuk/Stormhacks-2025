@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import CandidateCard from "@/components/CandidateCard";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { ArrowLeft, ArrowUpDown } from "lucide-react";
 
 // Mock data - replace with actual API calls
@@ -89,21 +90,26 @@ export default function JobDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
+      <header className="border-b backdrop-blur-sm bg-card/50">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold">{mockJob.title}</h1>
-              <p className="text-sm text-muted-foreground">
-                {mockJob.candidateCount} candidates screened
-              </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                  {mockJob.title}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {mockJob.candidateCount} candidates screened
+                </p>
+              </div>
             </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>

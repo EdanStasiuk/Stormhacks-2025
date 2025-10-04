@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +20,7 @@ export default function UploadForm() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
+  const fileIdCounter = useRef(0);
 
   const validateFile = (file: File): boolean => {
     const validTypes = [
@@ -47,9 +48,10 @@ export default function UploadForm() {
 
     Array.from(fileList).forEach((file) => {
       if (validateFile(file)) {
+        fileIdCounter.current += 1;
         validFiles.push({
           file,
-          id: `${file.name}-${Date.now()}-${Math.random()}`,
+          id: `${file.name}-${fileIdCounter.current}`,
         });
       }
     });

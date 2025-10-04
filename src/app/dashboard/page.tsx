@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Plus, Briefcase, Users, Clock } from "lucide-react";
 
 // Mock data - replace with actual API calls
@@ -37,19 +38,24 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
+      <header className="border-b backdrop-blur-sm bg-card/50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold">Lumina</h1>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Lumina
+              </h1>
               <p className="text-sm text-muted-foreground">Recruiter Dashboard</p>
             </div>
-            <Link href="/">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Job
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Link href="/">
+                <Button className="gradient-blue glow-blue">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Job
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -57,37 +63,37 @@ export default function Dashboard() {
       <main className="container mx-auto px-4 py-8">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card>
+          <Card className="border-primary/20 hover:border-primary/40 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Jobs</CardTitle>
-              <Briefcase className="h-4 w-4 text-muted-foreground" />
+              <Briefcase className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-3xl font-bold text-primary">
                 {jobs.filter((j) => j.status === "active").length}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-primary/20 hover:border-primary/40 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Candidates</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Users className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-3xl font-bold text-primary">
                 {jobs.reduce((acc, job) => acc + job.candidateCount, 0)}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-primary/20 hover:border-primary/40 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <Clock className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{jobs.length}</div>
+              <div className="text-3xl font-bold text-primary">{jobs.length}</div>
               <p className="text-xs text-muted-foreground">jobs this month</p>
             </CardContent>
           </Card>

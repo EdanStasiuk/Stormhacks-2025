@@ -2,33 +2,39 @@ import Link from "next/link";
 import UploadForm from "@/components/UploadForm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { LayoutDashboard, Briefcase, Users } from "lucide-react";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
+      <header className="border-b backdrop-blur-sm bg-card/50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold">Lumina</h1>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Lumina
+              </h1>
               <p className="text-sm text-muted-foreground">AI-Powered Resume Screening</p>
             </div>
-            <Link href="/dashboard">
-              <Button variant="outline">
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                View Dashboard
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Link href="/dashboard">
+                <Button className="gradient-blue glow-blue">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  View Dashboard
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <Card className="bg-primary/5 border-primary/20">
+          <Card className="gradient-blue-subtle border-primary/30 glow-blue">
             <CardHeader>
-              <CardTitle>Demo Links</CardTitle>
+              <CardTitle className="text-2xl">Demo Links</CardTitle>
               <CardDescription>Explore the different pages and features</CardDescription>
             </CardHeader>
             <CardContent>
