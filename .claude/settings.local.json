@@ -5,7 +5,9 @@
       "Bash(npx shadcn@latest add:*)",
       "Bash(npm run build:*)",
       "Bash(find:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(lsof:*)",
+      "Bash(kill:*)"
     ],
     "deny": [],
     "ask": []
