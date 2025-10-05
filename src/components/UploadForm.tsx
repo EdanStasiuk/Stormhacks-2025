@@ -21,17 +21,26 @@ export default function UploadForm() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
   const fileIdCounter = useRef(0);
+  const [stage, setStage] = useState<"idle" | "uploading" | "parsing" | "complete">("idle");
+  const [parsingProgress, setParsingProgress] = useState(0);
 
   const validateFile = (file: File): boolean => {
     const validTypes = [
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/msword",
+      "application/zip",
+      "application/x-zip-compressed",
     ];
+    const allowedExtensions = ["pdf", "docx", "doc", "zip"];
     const maxSize = 10 * 1024 * 1024; // 10MB
 
     if (!validTypes.includes(file.type)) {
-      setErrors((prev) => [...prev, `${file.name}: Only PDF and DOCX files are allowed`]);
-      return false;
+      const extension = file.name.split(".").pop()?.toLowerCase();
+      if (!extension || !allowedExtensions.includes(extension)) {
+        setErrors((prev) => [...prev, `${file.name}: Only PDF, DOCX, or ZIP files are allowed`]);
+        return false;
+      }
     }
 
     if (file.size > maxSize) {
@@ -88,6 +97,8 @@ export default function UploadForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    setErrors([]);
+
     if (files.length === 0) {
       setErrors(["Please upload at least one resume"]);
       return;
@@ -100,6 +111,8 @@ export default function UploadForm() {
 
     setIsUploading(true);
     setUploadProgress(0);
+    setParsingProgress(0);
+    setStage("uploading");
 
     try {
       // Simulate upload progress
@@ -107,31 +120,25 @@ export default function UploadForm() {
       files.forEach((f) => formData.append("resumes", f.file));
       formData.append("jobDescription", jobDescription);
 
-      // Simulate progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 200);
+      // Simulated upload + parsing flow
+      for (let progress = 0; progress <= 100; progress += 10) {
+        setUploadProgress(progress);
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => setTimeout(resolve, 160));
+      }
+
+      setStage("parsing");
+
+      for (let progress = 0; progress <= 100; progress += 12) {
+        setParsingProgress(progress > 100 ? 100 : progress);
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => setTimeout(resolve, 180));
+      }
+
+      setStage("complete");
 
       // TODO: Replace with actual API call
-      // const response = await fetch('/api/upload', {
-      //   method: 'POST',
-      //   body: formData,
-      // });
-
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-
-      // TODO: Redirect to job page or show success
-      console.log("Upload complete!");
+      console.log("Upload complete!", formData.getAll("resumes"));
     } catch (error) {
       setErrors(["Upload failed. Please try again."]);
     } finally {
@@ -151,7 +158,7 @@ export default function UploadForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* File Upload Area */}
           <div className="space-y-2">
-            <Label>Resumes (PDF or DOCX)</Label>
+            <Label>Resumes (PDF, DOCX, or ZIP)</Label>
             <div
               onDrop={handleDrop}
               onDragOver={handleDragOver}
@@ -166,7 +173,7 @@ export default function UploadForm() {
                 type="file"
                 id="file-upload"
                 multiple
-                accept=".pdf,.docx"
+                accept=".pdf,.docx,.zip"
                 onChange={handleFileInput}
                 className="hidden"
               />
@@ -180,7 +187,7 @@ export default function UploadForm() {
                   drop
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  PDF or DOCX (max 10MB per file)
+                  PDF, DOCX, or ZIP (max 10MB per file)
                 </p>
               </label>
             </div>
@@ -245,18 +252,37 @@ export default function UploadForm() {
 
           {/* Upload Progress */}
           {isUploading && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Processing resumes...</span>
-                <span>{uploadProgress}%</span>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Uploading files</span>
+                  <span>{uploadProgress}%</span>
+                </div>
+                <Progress value={uploadProgress} />
               </div>
-              <Progress value={uploadProgress} />
+              {stage !== "idle" && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>
+                      {stage === "parsing" || stage === "complete"
+                        ? "Parsing resumes"
+                        : "Waiting to parse"}
+                    </span>
+                    <span>{stage === "idle" ? "0%" : `${parsingProgress}%`}</span>
+                  </div>
+                  <Progress value={stage === "idle" ? 0 : parsingProgress} />
+                </div>
+              )}
             </div>
           )}
 
           {/* Submit Button */}
           <Button type="submit" className="w-full" disabled={isUploading}>
-            {isUploading ? "Processing..." : "Start Screening"}
+            {isUploading
+              ? stage === "complete"
+                ? "Wrapping up..."
+                : "Processing..."
+              : "Start Screening"}
           </Button>
         </form>
       </CardContent>
