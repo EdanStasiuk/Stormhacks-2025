@@ -156,21 +156,21 @@ export default function Dashboard() {
                 No jobs yet. Create your first job to get started!
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {jobs.map((job) => (
                   <div
                     key={job.id}
-                    className="p-4 rounded-lg border hover:border-primary transition-colors"
+                    className="p-3 rounded-lg border hover:border-primary transition-colors"
                   >
-                    <div className="flex justify-between items-start">
+                    <div className="flex justify-between items-center">
                       <Link href={`/jobs/${job.id}`} className="flex-1">
-                        <div className="space-y-1">
+                        <div className="flex items-center gap-3">
                           <h3 className="font-semibold">{job.title}</h3>
                           <p className="text-sm text-muted-foreground">
                             {job.candidateCount} candidates
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Created {new Date(job.createdAt).toLocaleDateString()}
+                            {new Date(job.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                       </Link>
