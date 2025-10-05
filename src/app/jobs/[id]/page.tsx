@@ -24,7 +24,7 @@ import {
 import CandidateCard from "@/components/CandidateCard";
 import JobResumeUpload from "@/components/JobResumeUpload";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ArrowLeft, ArrowUpDown } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, UserPlus, UserMinus } from "lucide-react";
 
 interface Candidate {
   id: string;
@@ -56,6 +56,7 @@ export default function JobDetail() {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<"overall" | "skills" | "experience">("overall");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [interviewCandidates, setInterviewCandidates] = useState<Set<string>>(new Set());
 
   const fetchData = async () => {
     try {
@@ -85,12 +86,27 @@ export default function JobDetail() {
     fetchData();
   }, [params.id]);
 
+  const toggleInterviewCandidate = (candidateId: string) => {
+    setInterviewCandidates((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(candidateId)) {
+        newSet.delete(candidateId);
+      } else {
+        newSet.add(candidateId);
+      }
+      return newSet;
+    });
+  };
+
   const sortedCandidates = [...candidates].sort((a, b) => {
     if (sortBy === "overall") return b.overallScore - a.overallScore;
     if (sortBy === "skills") return b.skillScore - a.skillScore;
     if (sortBy === "experience") return b.experienceScore - a.experienceScore;
     return 0;
   });
+
+  const availableCandidates = sortedCandidates.filter((c) => !interviewCandidates.has(c.id));
+  const selectedForInterview = sortedCandidates.filter((c) => interviewCandidates.has(c.id));
 
   if (loading) {
     return (
@@ -197,6 +213,69 @@ export default function JobDetail() {
           </div>
         </div>
 
+        {/* Interview List */}
+        {selectedForInterview.length > 0 && (
+          <Card className="mb-6 border-primary/50">
+            <CardHeader>
+              <CardTitle className="text-primary">Selected for Interview ({selectedForInterview.length})</CardTitle>
+              <CardDescription>
+                Candidates you've selected to interview
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead className="text-center">Overall Score</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {selectedForInterview.map((candidate) => (
+                    <TableRow key={candidate.id} className="bg-primary/5">
+                      <TableCell className="font-medium">{candidate.name}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {candidate.email}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge
+                          variant={
+                            candidate.overallScore >= 90
+                              ? "default"
+                              : candidate.overallScore >= 80
+                                ? "secondary"
+                                : "outline"
+                          }
+                        >
+                          {candidate.overallScore}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Link href={`/candidates/${candidate.id}`}>
+                            <Button variant="outline" size="sm">
+                              View Details
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleInterviewCandidate(candidate.id)}
+                          >
+                            <UserMinus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Candidates Display */}
         {candidates.length === 0 ? (
           <Card>
@@ -207,7 +286,7 @@ export default function JobDetail() {
         ) : viewMode === "table" ? (
           <Card>
             <CardHeader>
-              <CardTitle>Ranked Candidates</CardTitle>
+              <CardTitle>All Candidates</CardTitle>
               <CardDescription>
                 Candidates ranked by AI analysis of resume match to job requirements
               </CardDescription>
@@ -227,7 +306,7 @@ export default function JobDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedCandidates.map((candidate, index) => (
+                  {availableCandidates.map((candidate, index) => (
                     <TableRow key={candidate.id}>
                       <TableCell className="font-medium">{index + 1}</TableCell>
                       <TableCell className="font-medium">{candidate.name}</TableCell>
@@ -264,11 +343,22 @@ export default function JobDetail() {
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Link href={`/candidates/${candidate.id}`}>
-                          <Button variant="outline" size="sm">
-                            View Details
+                        <div className="flex justify-end gap-2">
+                          <Link href={`/candidates/${candidate.id}`}>
+                            <Button variant="outline" size="sm">
+                              View Details
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => toggleInterviewCandidate(candidate.id)}
+                            className="gap-1"
+                          >
+                            <UserPlus className="h-4 w-4" />
+                            Interview
                           </Button>
-                        </Link>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -278,7 +368,7 @@ export default function JobDetail() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {sortedCandidates.map((candidate, index) => (
+            {availableCandidates.map((candidate, index) => (
               <CandidateCard key={candidate.id} candidate={candidate} rank={index + 1} />
             ))}
           </div>
