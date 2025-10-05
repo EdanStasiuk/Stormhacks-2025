@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { analyzePortfolio, PortfolioAnalysisInput, PortfolioAnalysisResult } from "@/lib/portfolioAnalyzer";
+import { savePortfolioAnalysis } from "@/lib/db";
 
 export interface PortfolioAnalyzeRequest {
   candidateId: string;
@@ -81,9 +82,20 @@ export default async function handler(
 
     console.log(`✅ Analysis complete for candidate: ${input.candidateId}`);
 
+    // Save to database
+    await savePortfolioAnalysis(input.candidateId, input.github!, result);
+
+    console.log(`💾 Portfolio analysis saved to database for candidate: ${input.candidateId}`);
+
     return res.status(200).json({
       success: true,
-      data: result,
+      message: "Portfolio analysis completed and saved to database",
+      data: {
+        candidateId: result.candidateId,
+        overallScore: result.overallScore,
+        recommendation: result.recommendation,
+        summary: result.summary,
+      },
     });
   } catch (error: any) {
     console.error("Portfolio analysis error:", error);
