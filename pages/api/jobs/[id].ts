@@ -54,6 +54,71 @@ export default async function handler(
         error: error.message || "Failed to fetch job",
       });
     }
+  } else if (req.method === "DELETE") {
+    try {
+      // Verify job exists
+      const job = await prisma.job.findUnique({
+        where: { id },
+        include: {
+          candidates: {
+            include: {
+              resumes: true,
+              transcripts: true,
+              portfolio: true,
+            },
+          },
+        },
+      });
+
+      if (!job) {
+        return res.status(404).json({
+          success: false,
+          error: "Job not found",
+        });
+      }
+
+      // Cascade delete: Delete related data
+      // Delete resumes, transcripts, portfolios, candidates, then job
+      for (const candidate of job.candidates) {
+        // Delete resumes
+        await prisma.resume.deleteMany({
+          where: { candidateId: candidate.id },
+        });
+
+        // Delete transcripts
+        await prisma.transcript.deleteMany({
+          where: { candidateId: candidate.id },
+        });
+
+        // Delete portfolio if exists
+        if (candidate.portfolioId) {
+          await prisma.portfolio.delete({
+            where: { id: candidate.portfolioId },
+          });
+        }
+
+        // Delete candidate
+        await prisma.candidate.delete({
+          where: { id: candidate.id },
+        });
+      }
+
+      // Finally delete the job
+      await prisma.job.delete({
+        where: { id },
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Job and all related data deleted successfully",
+      });
+    } catch (error: any) {
+      console.error("Error deleting job:", error);
+      return res.status(500).json({
+        success: false,
+        error: error.message || "Failed to delete job",
+      });
+    }
   } else {
     return res.status(405).json({
       success: false,
