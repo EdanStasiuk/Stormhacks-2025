@@ -6,29 +6,29 @@
 :root {
   --radius: 0.75rem;
 
-  /* Base colors from your design - HSL format */
-  --background: 0 0% 0%;
-  --foreground: 210 40% 96%;
-  --muted: 217 33% 14%;
+  /* Light mode colors - HSL format */
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
   --accent: 182 86% 55%; /* Cyan */
   --accent-secondary: 291 93% 62%; /* Purple */
-  --accent-foreground: 210 40% 96%;
+  --accent-foreground: 0 0% 100%;
 
   /* Shadcn compatible colors */
-  --card: 217 33% 8%;
-  --card-foreground: 210 40% 96%;
-  --popover: 217 33% 10%;
-  --popover-foreground: 210 40% 96%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
   --primary: 182 86% 55%; /* Cyan accent */
   --primary-foreground: 0 0% 0%;
   --secondary: 291 93% 62%; /* Purple accent */
-  --secondary-foreground: 210 40% 96%;
-  --muted-foreground: 210 20% 60%;
-  --border: 217 33% 18%;
-  --input: 217 33% 18%;
+  --secondary-foreground: 0 0% 100%;
+  --muted-foreground: 215 16% 47%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
   --ring: 182 86% 55%;
   --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 96%;
+  --destructive-foreground: 0 0% 100%;
 
   /* Chart colors using cyan and purple theme */
   --chart-1: 182 86% 55%; /* Cyan */
@@ -38,13 +38,13 @@
   --chart-5: 165 85% 50%; /* Teal */
 
   /* Sidebar colors */
-  --sidebar: 217 33% 8%;
-  --sidebar-foreground: 210 40% 96%;
+  --sidebar: 0 0% 98%;
+  --sidebar-foreground: 222 47% 11%;
   --sidebar-primary: 182 86% 55%;
   --sidebar-primary-foreground: 0 0% 0%;
-  --sidebar-accent: 217 33% 14%;
-  --sidebar-accent-foreground: 210 40% 96%;
-  --sidebar-border: 217 33% 18%;
+  --sidebar-accent: 210 40% 96%;
+  --sidebar-accent-foreground: 222 47% 11%;
+  --sidebar-border: 214 32% 91%;
   --sidebar-ring: 182 86% 55%;
 }
 
