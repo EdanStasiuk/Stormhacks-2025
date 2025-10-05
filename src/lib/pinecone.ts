@@ -43,3 +43,33 @@ async function createStarterIndex() {
 
 // Uncomment the line below to create the starter index
 // createStarterIndex();
+
+/**
+ * Query Pinecone for similar vectors (semantic search)
+ * @param embedding - The query embedding vector
+ * @param topK - Number of top results to return (default: 10)
+ * @param filter - Optional metadata filter
+ * @returns Array of matches with scores
+ */
+export async function queryPinecone(
+    embedding: number[],
+    topK: number = 10,
+    filter?: Record<string, any>
+) {
+    try {
+        const index = pinecone.Index('candidates-job-matching');
+
+        const queryResponse = await index.query({
+            vector: embedding,
+            topK,
+            includeMetadata: true,
+            includeValues: false,
+            ...(filter && { filter }),
+        });
+
+        return queryResponse.matches || [];
+    } catch (error) {
+        console.error('Error querying Pinecone:', error);
+        throw error;
+    }
+}
