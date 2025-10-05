@@ -28,6 +28,7 @@ import { pinecone } from '@/lib/pinecone';
 import { parseResume, ensureValidEmail } from '@/lib/resumeParser';
 import { analyzePortfolio } from '@/lib/portfolioAnalyzer';
 import { savePortfolioAnalysis } from '@/lib/db';
+import { updateProcessingStatus, setProcessingError } from '@/lib/processingStatus';
 
 export const config = {
   api: {
@@ -141,6 +142,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       console.log(`\n📦 Starting resume upload pipeline for job: ${jobId}`);
 
+      updateProcessingStatus(jobId, 'uploading', 'Initializing upload pipeline');
+
       // Verify job exists
       const job = await prisma.job.findUnique({
         where: { id: jobId },
@@ -159,6 +162,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const fileList = Array.isArray(uploadedFiles) ? uploadedFiles : [uploadedFiles];
       const pdfFiles: string[] = [];
 
+      updateProcessingStatus(jobId, 'uploading', 'Extracting files from uploads');
+
       // Process files (extract ZIPs, collect PDFs)
       for (const file of fileList) {
         if (file.mimetype === 'application/zip' || file.originalFilename?.endsWith('.zip')) {
@@ -173,8 +178,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log(`📄 Found ${pdfFiles.length} PDF resumes to process`);
 
       if (pdfFiles.length === 0) {
+        setProcessingError(jobId, 'No PDF files found in upload');
         return res.status(400).json({ success: false, error: 'No PDF files found' });
       }
+
+      updateProcessingStatus(
+        jobId,
+        'parsing_resumes',
+        'Parsing resumes and extracting candidate data',
+        { current: 0, total: pdfFiles.length }
+      );
 
       const processedCandidates: string[] = [];
       const errors: string[] = [];
@@ -186,6 +199,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         try {
           console.log(`\n[${i + 1}/${pdfFiles.length}] Processing: ${fileName}`);
+
+          updateProcessingStatus(
+            jobId,
+            'parsing_resumes',
+            `Processing ${fileName}`,
+            { current: i + 1, total: pdfFiles.length }
+          );
 
           // 1. Extract text from PDF
           const resumeText = await extractPdfText(pdfPath);
@@ -291,9 +311,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       console.log(`\n✅ Processed ${processedCandidates.length} candidates`);
 
+      updateProcessingStatus(
+        jobId,
+        'generating_embeddings',
+        'Generating embeddings complete'
+      );
+
       // 8. Match all candidates to the job description
       if (job.description && processedCandidates.length > 0) {
         console.log(`\n🔍 Running semantic matching...`);
+
+        updateProcessingStatus(
+          jobId,
+          'semantic_matching',
+          'Matching candidates to job description'
+        );
 
         try {
           const jobText = `${job.title}\n\n${job.description}`;
@@ -326,7 +358,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // 9. Analyze top 10% of candidates with portfolio analysis
       if (processedCandidates.length > 0) {
-        console.log(`\n🎯 Analyzing top 10% of candidates...`);
+        console.log(`\n🎯 Starting portfolio analysis for top 10% of candidates...`);
+
+        updateProcessingStatus(
+          jobId,
+          'portfolio_analysis',
+          'Analyzing top 10% of candidates'
+        );
 
         try {
           // Fetch all candidates for this job, sorted by score
@@ -357,12 +395,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const topCount = Math.max(1, Math.min(10, Math.ceil(allCandidates.length * 0.1)));
           const topCandidates = allCandidates.slice(0, topCount);
 
-          console.log(`  🏆 Analyzing top ${topCount} candidates (${Math.round((topCount / allCandidates.length) * 100)}%)`);
+          const topWithGithub = topCandidates.filter(c => c.portfolio?.github);
+
+          console.log(`  🏆 Top ${topCount} candidates (${Math.round((topCount / allCandidates.length) * 100)}%)`);
+          console.log(`  🔗 ${topWithGithub.length} have GitHub URLs and will be analyzed`);
+
+          if (topWithGithub.length === 0) {
+            console.log(`  ⚠️  No candidates in top ${topCount} have GitHub URLs - skipping portfolio analysis`);
+          }
 
           let analyzedCount = 0;
           let skippedCount = 0;
 
-          for (const candidate of topCandidates) {
+          for (let idx = 0; idx < topCandidates.length; idx++) {
+            const candidate = topCandidates[idx];
+
+            updateProcessingStatus(
+              jobId,
+              'portfolio_analysis',
+              `Analyzing candidate ${idx + 1}/${topCandidates.length}: ${candidate.name}`,
+              { current: idx + 1, total: topCandidates.length }
+            );
             try {
               // Check if portfolio exists and has GitHub URL
               const githubUrl = candidate.portfolio?.github;
@@ -373,7 +426,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 continue;
               }
 
-              console.log(`  🔬 Analyzing ${candidate.name} (score: ${candidate.score?.toFixed(3)}) - ${githubUrl}`);
+              console.log(`\n  🔬 Analyzing ${candidate.name} (score: ${candidate.score?.toFixed(3)})`);
+              console.log(`     GitHub: ${githubUrl}`);
+              console.log(`     This may take 30-60 seconds per candidate...`);
 
               // Get resume data
               const latestResume = candidate.resumes[0];
@@ -424,6 +479,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       console.log(`\n✨ Upload pipeline complete!`);
 
+      updateProcessingStatus(jobId, 'complete', 'Upload and analysis complete');
+
       // Calculate analysis stats
       const allCandidatesForJob = await prisma.candidate.findMany({
         where: { jobId: jobId },
@@ -450,6 +507,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     } catch (error: any) {
       console.error('Upload pipeline error:', error);
+
+      const jobId = Array.isArray(fields?.jobId) ? fields.jobId[0] : fields?.jobId;
+      if (jobId) {
+        setProcessingError(jobId, error.message || 'Internal server error');
+      }
+
       return res.status(500).json({
         success: false,
         error: error.message || 'Internal server error',
