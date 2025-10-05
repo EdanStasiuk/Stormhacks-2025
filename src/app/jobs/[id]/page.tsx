@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import CandidateCard from "@/components/CandidateCard";
+import JobResumeUpload from "@/components/JobResumeUpload";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ArrowLeft, ArrowUpDown } from "lucide-react";
 
@@ -56,30 +57,31 @@ export default function JobDetail() {
   const [sortBy, setSortBy] = useState<"overall" | "skills" | "experience">("overall");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const jobId = params.id as string;
+  const fetchData = async () => {
+    try {
+      const jobId = params.id as string;
 
-        // Fetch job details
-        const jobResponse = await fetch(`/api/jobs/${jobId}`);
-        const jobResult = await jobResponse.json();
-        if (jobResult.success) {
-          setJob(jobResult.data);
-        }
-
-        // Fetch candidates for this job
-        const candidatesResponse = await fetch(`/api/candidates?jobId=${jobId}`);
-        const candidatesResult = await candidatesResponse.json();
-        if (candidatesResult.success) {
-          setCandidates(candidatesResult.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setLoading(false);
+      // Fetch job details
+      const jobResponse = await fetch(`/api/jobs/${jobId}`);
+      const jobResult = await jobResponse.json();
+      if (jobResult.success) {
+        setJob(jobResult.data);
       }
+
+      // Fetch candidates for this job
+      const candidatesResponse = await fetch(`/api/candidates?jobId=${jobId}`);
+      const candidatesResult = await candidatesResponse.json();
+      if (candidatesResult.success) {
+        setCandidates(candidatesResult.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [params.id]);
 
@@ -154,6 +156,11 @@ export default function JobDetail() {
             </div>
           </CardHeader>
         </Card>
+
+        {/* Resume Upload */}
+        <div className="mb-6">
+          <JobResumeUpload jobId={job.id} onUploadComplete={fetchData} />
+        </div>
 
         {/* Filters and Controls */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
