@@ -6,7 +6,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Plus, Briefcase, Users, Clock } from "lucide-react";
+import { Plus, Briefcase, Users, Clock, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Job {
   id: string;
@@ -19,6 +29,8 @@ interface Job {
 export default function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteJobId, setDeleteJobId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     async function fetchJobs() {
@@ -36,6 +48,33 @@ export default function Dashboard() {
     }
     fetchJobs();
   }, []);
+
+  const handleDelete = async () => {
+    if (!deleteJobId) return;
+
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/jobs/${deleteJobId}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Remove job from state
+        setJobs(jobs.filter((job) => job.id !== deleteJobId));
+        setDeleteJobId(null);
+      } else {
+        console.error("Failed to delete job:", result.error);
+        alert("Failed to delete job: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error deleting job:", error);
+      alert("Error deleting job");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -119,32 +158,67 @@ export default function Dashboard() {
             ) : (
               <div className="space-y-4">
                 {jobs.map((job) => (
-                  <Link
+                  <div
                     key={job.id}
-                    href={`/jobs/${job.id}`}
-                    className="block p-4 rounded-lg border hover:border-primary transition-colors"
+                    className="p-4 rounded-lg border hover:border-primary transition-colors"
                   >
                     <div className="flex justify-between items-start">
-                      <div className="space-y-1">
-                        <h3 className="font-semibold">{job.title}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {job.candidateCount} candidates
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Created {new Date(job.createdAt).toLocaleDateString()}
-                        </p>
+                      <Link href={`/jobs/${job.id}`} className="flex-1">
+                        <div className="space-y-1">
+                          <h3 className="font-semibold">{job.title}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {job.candidateCount} candidates
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Created {new Date(job.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={job.status === "active" ? "default" : "secondary"}>
+                          {job.status}
+                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setDeleteJobId(job.id);
+                          }}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <Badge variant={job.status === "active" ? "default" : "secondary"}>
-                        {job.status}
-                      </Badge>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
           </CardContent>
         </Card>
       </main>
+
+      <AlertDialog open={!!deleteJobId} onOpenChange={() => setDeleteJobId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Job</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this job? This will permanently delete the job and all associated candidates, resumes, transcripts, and portfolios. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
