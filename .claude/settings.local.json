@@ -7,7 +7,11 @@
       "Bash(find:*)",
       "Bash(npm run dev:*)",
       "Bash(lsof:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(cat:*)",
+      "Bash(curl:*)",
+      "Bash(npx tsx:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

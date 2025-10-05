@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,33 +8,34 @@ import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Plus, Briefcase, Users, Clock } from "lucide-react";
 
-// Mock data - replace with actual API calls
-const mockJobs = [
-  {
-    id: "1",
-    title: "Senior Frontend Developer",
-    candidateCount: 45,
-    status: "active",
-    createdAt: "2025-10-01",
-  },
-  {
-    id: "2",
-    title: "Product Manager",
-    candidateCount: 23,
-    status: "active",
-    createdAt: "2025-10-02",
-  },
-  {
-    id: "3",
-    title: "UX Designer",
-    candidateCount: 18,
-    status: "completed",
-    createdAt: "2025-09-28",
-  },
-];
+interface Job {
+  id: string;
+  title: string;
+  candidateCount: number;
+  status: string;
+  createdAt: string;
+}
 
 export default function Dashboard() {
-  const [jobs] = useState(mockJobs);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchJobs() {
+      try {
+        const response = await fetch("/api/jobs");
+        const result = await response.json();
+        if (result.success) {
+          setJobs(result.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch jobs:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchJobs();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,8 +107,15 @@ export default function Dashboard() {
             <CardDescription>View and manage your job postings</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {jobs.map((job) => (
+            {loading ? (
+              <div className="text-center py-8 text-muted-foreground">Loading jobs...</div>
+            ) : jobs.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No jobs yet. Create your first job to get started!
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {jobs.map((job) => (
                 <Link
                   key={job.id}
                   href={`/jobs/${job.id}`}
@@ -130,6 +138,7 @@ export default function Dashboard() {
                 </Link>
               ))}
             </div>
+            )}
           </CardContent>
         </Card>
       </main>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,74 +19,110 @@ import {
   Sparkles,
 } from "lucide-react";
 
-// Mock data - replace with actual API call
-const mockCandidate = {
-  id: "1",
-  name: "Alice Johnson",
-  email: "alice@example.com",
-  phone: "+1 (555) 123-4567",
-  location: "San Francisco, CA",
-  overallScore: 95,
-  skillScore: 98,
-  experienceScore: 92,
-  educationScore: 90,
-  portfolio: "https://alice.dev",
-  linkedin: "https://linkedin.com/in/alicejohnson",
-  github: "https://github.com/alicejohnson",
-  resumeUrl: "/resumes/alice.pdf",
-  insights: "Strong React and TypeScript experience. 5+ years in frontend development.",
-  skills: [
-    { name: "React", match: 98 },
-    { name: "TypeScript", match: 95 },
-    { name: "Next.js", match: 92 },
-    { name: "Tailwind CSS", match: 90 },
-    { name: "Node.js", match: 85 },
-    { name: "GraphQL", match: 80 },
-  ],
-  experience: [
-    {
-      title: "Senior Frontend Developer",
-      company: "Tech Corp",
-      duration: "2021 - Present",
-      description:
-        "Led frontend development for flagship SaaS product. Improved performance by 40%.",
-    },
-    {
-      title: "Frontend Developer",
-      company: "StartupXYZ",
-      duration: "2019 - 2021",
-      description: "Built responsive web applications using React and Redux.",
-    },
-  ],
-  education: [
-    {
-      degree: "B.S. Computer Science",
-      institution: "Stanford University",
-      year: "2019",
-    },
-  ],
-  aiAnalysis: {
-    strengths: [
-      "Extensive React and TypeScript expertise matches job requirements perfectly",
-      "Strong track record of performance optimization",
-      "Proven leadership experience in frontend architecture",
-    ],
-    concerns: [
-      "Limited experience with testing frameworks mentioned in job description",
-      "No mention of accessibility (a11y) best practices",
-    ],
-    recommendation:
-      "Highly recommended for interview. Candidate demonstrates exceptional technical skills and leadership experience that align perfectly with the role requirements.",
-  },
-};
+interface RepoAnalysis {
+  repo: string;
+  url: string;
+  qualityScore: number;
+  relevanceScore: number;
+  impressivenessLevel: string;
+  resumeMatchLevel: string;
+  technologies: string[];
+  strengths: string[];
+  concerns: string[];
+  insights: string;
+}
+
+interface Candidate {
+  id: string;
+  name: string;
+  email: string;
+  skills: string[];
+  experience: string;
+  education: string;
+  overallScore: number;
+  skillScore: number;
+  experienceScore: number;
+  educationScore: number;
+  linkedin: string | null;
+  github: string | null;
+  resumeUrl: string | null;
+  insights: string;
+  job: {
+    id: string;
+    title: string;
+  };
+  portfolio?: {
+    github: string | null;
+    linkedin: string | null;
+    website: string | null;
+    analysisData: any;
+    overallScore: number | null;
+    resumeAlignment: number | null;
+    recommendation: string | null;
+    technicalLevel: string | null;
+    summary: string | null;
+    strengths: string[];
+    weaknesses: string[];
+    concerns: string[];
+    standoutQualities: string[];
+  };
+  resumes?: Array<{
+    id: string;
+    fileUrl: string;
+    uploadedAt: string;
+  }>;
+}
 
 export default function CandidateDetail() {
   const params = useParams();
   const router = useRouter();
+  const [candidate, setCandidate] = useState<Candidate | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCandidate() {
+      try {
+        const candidateId = params.id as string;
+        const response = await fetch(`/api/candidates/${candidateId}`);
+        const result = await response.json();
+        if (result.success) {
+          setCandidate(result.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch candidate:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCandidate();
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!candidate) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Candidate not found</p>
+          <Button className="mt-4" onClick={() => router.back()}>
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b backdrop-blur-sm bg-card/50">
+      <header className="border-b bg-background">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -94,16 +131,17 @@ export default function CandidateDetail() {
                 Back
               </Button>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                  {mockCandidate.name}
+                <h1 className="text-xl font-semibold">
+                  {candidate.name}
                 </h1>
-                <p className="text-sm text-muted-foreground">{mockCandidate.location}</p>
+                <p className="text-sm text-muted-foreground">{candidate.job.title}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge className="text-lg px-4 py-2 gradient-blue">
-                Overall Score: {mockCandidate.overallScore}
-              </Badge>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <div className="text-xs text-muted-foreground">Match Score</div>
+                <div className="text-lg font-semibold">{candidate.overallScore}</div>
+              </div>
               <ThemeToggle />
             </div>
           </div>
@@ -117,19 +155,19 @@ export default function CandidateDetail() {
             {/* Contact Info */}
             <Card>
               <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
+                <CardTitle className="text-base">Contact</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <a href={`mailto:${mockCandidate.email}`} className="text-primary hover:underline">
-                    {mockCandidate.email}
+                  <a href={`mailto:${candidate.email}`} className="text-primary hover:underline">
+                    {candidate.email}
                   </a>
                 </div>
                 <div className="flex gap-2">
-                  {mockCandidate.portfolio && (
+                  {candidate.portfolio?.website && (
                     <a
-                      href={mockCandidate.portfolio}
+                      href={candidate.portfolio.website}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 text-sm text-primary hover:underline"
@@ -138,9 +176,9 @@ export default function CandidateDetail() {
                       Portfolio
                     </a>
                   )}
-                  {mockCandidate.linkedin && (
+                  {candidate.portfolio?.linkedin && (
                     <a
-                      href={mockCandidate.linkedin}
+                      href={candidate.portfolio.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 text-sm text-primary hover:underline"
@@ -149,9 +187,9 @@ export default function CandidateDetail() {
                       LinkedIn
                     </a>
                   )}
-                  {mockCandidate.github && (
+                  {candidate.portfolio?.github && (
                     <a
-                      href={mockCandidate.github}
+                      href={candidate.portfolio.github}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 text-sm text-primary hover:underline"
@@ -167,65 +205,122 @@ export default function CandidateDetail() {
             {/* Skills Match */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5" />
-                  Skills Match
-                </CardTitle>
-                <CardDescription>How candidate skills align with job requirements</CardDescription>
+                <CardTitle className="text-base">Skills</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {mockCandidate.skills.map((skill) => (
-                  <div key={skill.name} className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="font-medium">{skill.name}</span>
-                      <span className="text-muted-foreground">{skill.match}%</span>
-                    </div>
-                    <Progress value={skill.match} />
+              <CardContent>
+                {candidate.skills.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {candidate.skills.map((skill, index) => (
+                      <Badge key={index} variant="secondary" className="px-3 py-1">
+                        {skill}
+                      </Badge>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <p className="text-sm text-muted-foreground">No skills data available</p>
+                )}
+                <div className="mt-4 pt-4 border-t">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="font-medium">Overall Skill Match</span>
+                      <span className="text-muted-foreground">{candidate.skillScore}%</span>
+                    </div>
+                    <Progress value={candidate.skillScore} />
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
             {/* Experience */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Briefcase className="h-5 w-5" />
-                  Work Experience
-                </CardTitle>
+                <CardTitle className="text-base">Experience</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {mockCandidate.experience.map((exp, index) => (
-                  <div key={index} className="border-l-2 border-muted pl-4">
-                    <h3 className="font-semibold">{exp.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {exp.company} " {exp.duration}
-                    </p>
-                    <p className="text-sm mt-2">{exp.description}</p>
+                {candidate.experience ? (
+                  <div className="border-l-2 border-muted pl-4">
+                    <p className="text-sm">{candidate.experience}</p>
                   </div>
-                ))}
+                ) : (
+                  <p className="text-sm text-muted-foreground">No experience data available</p>
+                )}
               </CardContent>
             </Card>
 
             {/* Education */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5" />
-                  Education
-                </CardTitle>
+                <CardTitle className="text-base">Education</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {mockCandidate.education.map((edu, index) => (
-                  <div key={index}>
-                    <h3 className="font-semibold">{edu.degree}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {edu.institution} " {edu.year}
-                    </p>
+                {candidate.education ? (
+                  <div>
+                    <p className="text-sm">{candidate.education}</p>
                   </div>
-                ))}
+                ) : (
+                  <p className="text-sm text-muted-foreground">No education data available</p>
+                )}
               </CardContent>
             </Card>
+
+            {/* Top Projects - from analysisData if available */}
+            {candidate.portfolio?.analysisData?.topProjects &&
+              candidate.portfolio.analysisData.topProjects.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Projects</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {candidate.portfolio.analysisData.topProjects.map(
+                      (project: RepoAnalysis, index: number) => (
+                        <div key={index} className="border-l-2 border-primary/40 pl-4 space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <a
+                                href={project.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-semibold hover:text-primary flex items-center gap-1"
+                              >
+                                {project.repo}
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
+                              <div className="flex gap-2 mt-1">
+                                <Badge variant="outline" className="text-xs">
+                                  Quality: {project.qualityScore}/10
+                                </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  Relevance: {project.relevanceScore}/10
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          {project.technologies && project.technologies.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {project.technologies.slice(0, 5).map((tech, i) => (
+                                <Badge key={i} variant="secondary" className="text-xs">
+                                  {tech}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          <p className="text-sm text-muted-foreground italic">{project.insights}</p>
+                          {project.strengths && project.strengths.length > 0 && (
+                            <div className="text-xs">
+                              <span className="font-medium text-green-600">Key strengths:</span>
+                              <ul className="list-disc list-inside ml-2 text-muted-foreground">
+                                {project.strengths.slice(0, 2).map((strength, i) => (
+                                  <li key={i}>{strength}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    )}
+                  </CardContent>
+                </Card>
+              )}
           </div>
 
           {/* Sidebar */}
@@ -233,94 +328,141 @@ export default function CandidateDetail() {
             {/* Score Breakdown */}
             <Card>
               <CardHeader>
-                <CardTitle>Score Breakdown</CardTitle>
+                <CardTitle className="text-base">Scores</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Overall</span>
-                    <span className="font-bold">{mockCandidate.overallScore}</span>
+                    <span className="font-bold">{candidate.overallScore}</span>
                   </div>
-                  <Progress value={mockCandidate.overallScore} />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Skills</span>
-                    <span className="font-bold">{mockCandidate.skillScore}</span>
-                  </div>
-                  <Progress value={mockCandidate.skillScore} />
+                  <Progress value={candidate.overallScore} />
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Experience</span>
-                    <span className="font-bold">{mockCandidate.experienceScore}</span>
+                    <span className="font-bold">{candidate.experienceScore}</span>
                   </div>
-                  <Progress value={mockCandidate.experienceScore} />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Education</span>
-                    <span className="font-bold">{mockCandidate.educationScore}</span>
-                  </div>
-                  <Progress value={mockCandidate.educationScore} />
+                  <Progress value={candidate.experienceScore} />
                 </div>
               </CardContent>
             </Card>
 
-            {/* AI Analysis */}
-            <Card className="gradient-blue-subtle border-primary/30 glow-blue">
+            {/* Analysis */}
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  AI Analysis
-                </CardTitle>
+                <CardTitle className="text-base">Analysis</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
+                {candidate.portfolio?.summary && (
+                  <div className="pb-3 border-b">
+                    <p className="text-sm leading-relaxed">{candidate.portfolio.summary}</p>
+                  </div>
+                )}
                 <div>
-                  <h3 className="font-semibold text-sm mb-2 text-green-600">Strengths</h3>
-                  <ul className="space-y-1 text-sm">
-                    {mockCandidate.aiAnalysis.strengths.map((strength, index) => (
-                      <li key={index} className="flex gap-2">
-                        <span className="text-green-600">"</span>
-                        <span>{strength}</span>
-                      </li>
-                    ))}
+                  <h3 className="font-medium text-sm mb-1.5">Strengths</h3>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    {candidate.portfolio?.strengths && candidate.portfolio.strengths.length > 0 ? (
+                      candidate.portfolio.strengths.map((strength, index) => (
+                        <li key={index} className="flex gap-2 leading-relaxed">
+                          <span className="mt-1.5">·</span>
+                          <span>{strength}</span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-muted-foreground">No data available</li>
+                    )}
                   </ul>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-sm mb-2 text-amber-600">Areas to Explore</h3>
-                  <ul className="space-y-1 text-sm">
-                    {mockCandidate.aiAnalysis.concerns.map((concern, index) => (
-                      <li key={index} className="flex gap-2">
-                        <span className="text-amber-600">"</span>
-                        <span>{concern}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="pt-2 border-t">
-                  <h3 className="font-semibold text-sm mb-2">Recommendation</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {mockCandidate.aiAnalysis.recommendation}
-                  </p>
-                </div>
+                {candidate.portfolio?.standoutQualities &&
+                  candidate.portfolio.standoutQualities.length > 0 && (
+                    <div>
+                      <h3 className="font-medium text-sm mb-1.5">Highlights</h3>
+                      <ul className="space-y-1 text-sm text-muted-foreground">
+                        {candidate.portfolio.standoutQualities.map((quality, index) => (
+                          <li key={index} className="flex gap-2 leading-relaxed">
+                            <span className="mt-1.5">·</span>
+                            <span>{quality}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                {candidate.portfolio?.concerns && candidate.portfolio.concerns.length > 0 && (
+                  <div>
+                    <h3 className="font-medium text-sm mb-1.5">Questions</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      {candidate.portfolio.concerns.map((concern, index) => (
+                        <li key={index} className="flex gap-2 leading-relaxed">
+                          <span className="mt-1.5">·</span>
+                          <span>{concern}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {candidate.portfolio?.weaknesses && candidate.portfolio.weaknesses.length > 0 && (
+                  <div>
+                    <h3 className="font-medium text-sm mb-1.5">Gaps</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      {candidate.portfolio.weaknesses.map((weakness, index) => (
+                        <li key={index} className="flex gap-2 leading-relaxed">
+                          <span className="mt-1.5">·</span>
+                          <span>{weakness}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {candidate.portfolio?.recommendation && (
+                  <div className="pt-3 border-t">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-sm">Decision</h3>
+                      {candidate.portfolio?.technicalLevel && (
+                        <span className="text-xs text-muted-foreground">
+                          {candidate.portfolio.technicalLevel}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {candidate.portfolio.recommendation.replace(/_/g, " ")}
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             {/* Actions */}
-            <Card className="border-primary/20">
+            <Card>
               <CardHeader>
-                <CardTitle>Actions</CardTitle>
+                <CardTitle className="text-base">Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button className="w-full gradient-blue glow-blue">Schedule Interview</Button>
-                <Button variant="outline" className="w-full border-primary/30 hover:bg-primary/10">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Download Resume
-                </Button>
-                <Button variant="outline" className="w-full border-primary/30 hover:bg-primary/10">
-                  Send Email
-                </Button>
+                <Button className="w-full">Schedule Interview</Button>
+                {candidate.resumeUrl ? (
+                  <a
+                    href={candidate.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Button variant="outline" className="w-full">
+                      <FileText className="h-4 w-4 mr-2" />
+                      View Resume
+                    </Button>
+                  </a>
+                ) : (
+                  <Button variant="outline" className="w-full" disabled>
+                    <FileText className="h-4 w-4 mr-2" />
+                    No Resume
+                  </Button>
+                )}
+                <a href={`mailto:${candidate.email}`} className="block">
+                  <Button variant="outline" className="w-full">
+                    <Mail className="h-4 w-4 mr-2" />
+                    Email
+                  </Button>
+                </a>
               </CardContent>
             </Card>
           </div>
