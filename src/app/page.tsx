@@ -1,4 +1,8 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
+
+export const revalidate = 60;
+
 import {
   ArrowRight,
   BadgeCheck,
@@ -13,120 +17,125 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-const metrics = [
-  {
-    label: "Resumes scored",
-    value: "3.2M+",
-    description: "Processed through Lumina pipelines in the last 12 weeks",
-  },
-  {
-    label: "Hiring cycle speed",
-    value: "4.6×",
-    description: "Average acceleration reported by hackathon partner teams",
-  },
-  {
-    label: "Signal visibility",
-    value: "92%",
-    description: "Of recruiters say they uncover hidden talent with Lumina",
-  },
-];
-
 const featurePillars = [
   {
-    icon: <Sparkles className="h-6 w-6 text-cyan-300" />,
-    title: "AI copilots that feel human",
+    icon: <Sparkles className="h-6 w-6 text-cyan-300 animate-float-slow" />,
+    title: "Structured candidate briefs",
     description:
-      "Instant talent briefs generated from raw resumes, job specs, and portfolio links — with narrative context you can trust.",
+      "Instant summaries that highlight role fit, recent wins, and must-know context for recruiters.",
   },
   {
-    icon: <Workflow className="h-6 w-6 text-purple-300" />,
-    title: "Adaptive hiring workflows",
+    icon: <Workflow className="h-6 w-6 text-purple-300 animate-float-slow" />,
+    title: "Adaptive assignment flows",
     description:
-      "Drag-and-drop flows that recalibrate ranking models in real time as your team collaborates on priorities.",
+      "Route resumes to the right reviewer, capture feedback, and keep conversations in one thread.",
   },
   {
-    icon: <BadgeCheck className="h-6 w-6 text-blue-300" />,
-    title: "Bias-aware scoring engine",
+    icon: <BadgeCheck className="h-6 w-6 text-blue-300 animate-float-slow" />,
+    title: "Transparent scoring",
     description:
-      "Transparent scoring with fairness guardrails, redaction, and reviewer checkpoints baked into every step.",
+      "Explainable match criteria show the skills, tenure, and achievements that influence every rank.",
   },
 ];
 
 const experienceHighlights = [
   {
     icon: CircuitBoard,
-    title: "Realtime signal graph",
-    copy: "Visualize skills, experience, and potential across every candidate in one pulsing, living graph.",
+    title: "Realtime parsing",
+    copy: "Every resume is parsed into structured data seconds after it lands in your intake folder.",
   },
   {
     icon: Palette,
-    title: "Story-driven briefs",
-    copy: "Beautiful candidate cards with AI-written summaries, portfolio callouts, and interview-ready prompts.",
+    title: "Context-rich profiles",
+    copy: "Readable profiles combine raw experience with portfolio links, certifications, and notes.",
   },
   {
     icon: Clock3,
-    title: "Minutes, not months",
-    copy: "Upload a stack of resumes, paste your job brief, and watch Lumina draft your shortlist before the demo clock hits zero.",
+    title: "Faster shortlists",
+    copy: "Filter by skills, tenure, or location to hand recruiters a shortlist before the intake meeting ends.",
   },
   {
     icon: BarChart3,
-    title: "Insights that ship",
-    copy: "Ship analytics dashboards, Slack digests, and hiring snapshots to keep the whole team aligned overnight.",
+    title: "ATS-friendly exports",
+    copy: "Sync structured fields back to your ATS or share snapshots with hiring managers instantly.",
   },
 ];
 
 const workflow = [
   {
     step: "01",
-    title: "Upload & calibrate",
-    detail: "Drop resumes, link your job description, and Lumina auto-redacts PII while learning what success looks like for your team.",
+    title: "Upload & align",
+    detail: "Import resumes or connect your sourcing inbox, then tailor the scoring rubric to your open role.",
   },
   {
     step: "02",
-    title: "Rank with transparency",
-    detail: "Our explainable AI surfaces match scores with the exact projects, skills, and outcomes that drove the decision.",
+    title: "Review & collaborate",
+    detail: "Share structured candidate briefs, collect feedback, and surface questions before interviews start.",
   },
   {
     step: "03",
-    title: "Activate the shortlist",
-    detail: "Export to your ATS, spin up interview packets, or invite stakeholders into live collaboration mode — all in one click.",
+    title: "Move to outreach",
+    detail: "Export ranked lists, trigger recruiter follow-ups, and update downstream tools without duplicate work.",
   },
 ];
 
 const partners = [
-  "Vercel x Hack Club",
-  "SF Build Fest",
-  "AI Builders League",
-  "Toronto Dev Summit",
-  "MLH Prime",
-  "Neo Launchpad",
+  "In-house recruiting teams",
+  "Talent acquisition agencies",
+  "People operations leads",
+  "Executive hiring pods",
+  "University recruiting squads",
+  "People analytics groups",
 ];
+
+const marqueePartners = [...partners, ...partners];
 
 const faqs = [
   {
-    question: "Can I customize the scoring model during a hackathon?",
+    question: "Can we tune Lumina to our hiring rubric?",
     answer:
-      "Absolutely. Drag the sliders for seniority, domain expertise, or culture fit and Lumina recalibrates rankings instantly with full visibility into the changes.",
+      "Yes. Adjust weighting for skills, tenure, education, or custom fields, and Lumina reflects the updates across new resumes immediately.",
   },
   {
-    question: "Do you support sensitive hiring data?",
+    question: "How does Lumina handle sensitive information?",
     answer:
-      "Yes. Every resume is auto-redacted before analysis and we provide audit trails on every AI-generated insight so judges and stakeholders see the entire journey.",
+      "We redact personal identifiers before analysis and maintain an audit log for every generated insight so compliance and recruiting operations stay aligned.",
   },
   {
-    question: "How fast can we launch a live demo?",
+    question: "Does Lumina work with our existing ATS?",
     answer:
-      "In under five minutes. Spin up a workspace, invite teammates, and stream your first hiring insights live on stage with our prebuilt showcase scenes.",
+      "Export structured data as CSV, JSON, or through our API to populate the systems your recruiters already use.",
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
+
+  const metrics = [
+    {
+      label: "Active roles",
+      value: 15,
+      description: "Jobs currently tracked inside Lumina for your recruiting team.",
+    },
+    {
+      label: "Candidates enriched",
+      value: 200,
+      description: "People with structured profiles, notes, and reviewer feedback in one view.",
+    },
+    {
+      label: "Resumes parsed",
+      value: 50012,
+      description: "Files converted into searchable data and ready to sync with your ATS.",
+    },
+  ];
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-slate-100">
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/2 top-[-20%] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,_rgba(34,211,238,0.35)_0%,_rgba(0,0,0,0)_65%)] blur-[140px]" />
         <div className="absolute right-[-10%] top-[35%] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_center,_rgba(168,85,247,0.32)_0%,_rgba(0,0,0,0)_68%)] blur-[130px]" />
         <div className="absolute left-[-12%] bottom-[-15%] h-[360px] w-[360px] rounded-full bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.28)_0%,_rgba(0,0,0,0)_70%)] blur-[120px]" />
+        <div className="absolute left-1/2 top-1/2 h-[640px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/5 bg-[radial-gradient(circle_at_center,_rgba(34,211,238,0.18)_0%,_rgba(0,0,0,0)_60%)] opacity-40 animate-spin-slower" />
       </div>
 
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/70 backdrop-blur-xl">
@@ -142,19 +151,19 @@ export default function Home() {
           </div>
 
           <nav className="hidden items-center gap-8 text-sm text-slate-400 lg:flex">
-            <a className="transition hover:text-cyan-200" href="#story">
+            <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#story">
               Story
             </a>
-            <a className="transition hover:text-cyan-200" href="#features">
+            <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#features">
               Features
             </a>
-            <a className="transition hover:text-cyan-200" href="#workflow">
+            <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#workflow">
               Workflow
             </a>
-            <a className="transition hover:text-cyan-200" href="#showcase">
+            <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#showcase">
               Showcase
             </a>
-            <a className="transition hover:text-cyan-200" href="#faqs">
+            <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#faqs">
               FAQs
             </a>
           </nav>
@@ -162,13 +171,18 @@ export default function Home() {
           <div className="hidden items-center gap-3 lg:flex">
             <Button
               variant="outline"
-              className="border-white/20 bg-transparent text-slate-200 transition hover:border-cyan-400/60 hover:text-white"
+              className="border-white/20 bg-transparent text-slate-200 transition duration-500 ease-out hover:-translate-y-1 hover:border-cyan-400/60 hover:text-white"
             >
               Join beta
             </Button>
-            <Button className="bg-gradient-to-r from-cyan-500 via-sky-500 to-purple-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_20px_50px_-25px_rgba(34,211,238,0.65)] transition hover:brightness-110">
-              Launch demo
-              <ArrowRight className="ml-2 h-4 w-4" />
+            <Button
+              asChild
+              className="bg-gradient-to-r from-cyan-500 via-sky-500 to-purple-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_20px_50px_-25px_rgba(34,211,238,0.65)] transition duration-500 ease-out hover:-translate-y-1 hover:brightness-110"
+            >
+              <Link href="/dashboard">
+                Launch demo
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -177,31 +191,44 @@ export default function Home() {
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-24 px-6 py-16">
         <section id="story" className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div className="space-y-6">
-            <span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-cyan-200">
-              Built for hackathon momentum
+            <span
+              className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-cyan-200 animate-fade-in-up"
+              style={{ "--animation-delay": "60ms" } as CSSProperties}
+            >
+              Built for modern recruiting teams
             </span>
-            <h2 className="text-4xl font-semibold leading-tight text-white md:text-5xl">
-              Ship recruiter-ready intelligence in the time it takes to pitch your idea.
+            <h2
+              className="text-4xl font-semibold leading-tight text-white md:text-5xl animate-fade-in-up"
+              style={{ "--animation-delay": "120ms" } as CSSProperties}
+            >
+              Deliver recruiter-ready intelligence the moment resumes enter the pipeline.
             </h2>
-            <p className="text-base leading-7 text-slate-300">
-              Lumina turns raw resumes, job specs, and team intuition into narrative-rich candidate stories. Our AI copilots
-              handle the heavy lifting so your hackathon demo looks like a production launch.
+            <p
+              className="text-base leading-7 text-slate-300 animate-fade-in-up"
+              style={{ "--animation-delay": "200ms" } as CSSProperties}
+            >
+              Lumina turns raw resumes, job specs, and team feedback into narrative-rich candidate profiles. Recruiters get
+              the context they need without chasing spreadsheets or manual notes.
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Button className="bg-gradient-to-r from-cyan-500 via-emerald-500 to-sky-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_22px_60px_-28px_rgba(34,211,238,0.7)] transition hover:brightness-110">
-                Get live walkthrough
+            <div className="flex flex-col gap-4 sm:flex-row animate-fade-in-up" style={{ "--animation-delay": "260ms" } as CSSProperties}>
+              <Button className="bg-gradient-to-r from-cyan-500 via-emerald-500 to-sky-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_22px_60px_-28px_rgba(34,211,238,0.7)] transition duration-500 ease-out hover:-translate-y-1 hover:brightness-110">
+                Request a walkthrough
               </Button>
               <Button
                 variant="outline"
-                className="border-white/20 bg-transparent px-6 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400/50 hover:text-white"
+                className="border-white/20 bg-transparent px-6 py-3 text-sm font-semibold text-slate-200 transition duration-500 ease-out hover:-translate-y-1 hover:border-cyan-400/50 hover:text-white"
               >
-                Download starter kit
+                View implementation guide
               </Button>
             </div>
 
             <dl className="grid gap-6 sm:grid-cols-3">
-              {metrics.map((metric) => (
-                <div key={metric.label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              {metrics.map((metric, index) => (
+                <div
+                  key={metric.label}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-4 animate-fade-in-up"
+                  style={{ "--animation-delay": `${320 + index * 120}ms` } as CSSProperties}
+                >
                   <dt className="text-xs uppercase tracking-[0.4em] text-slate-500">{metric.label}</dt>
                   <dd className="mt-2 text-2xl font-semibold text-white">{metric.value}</dd>
                   <p className="mt-2 text-xs leading-5 text-slate-400">{metric.description}</p>
@@ -210,7 +237,10 @@ export default function Home() {
             </dl>
           </div>
 
-          <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-white/5 p-8 shadow-[0_32px_90px_-48px_rgba(34,211,238,0.6)] backdrop-blur">
+          <div
+            className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-white/5 p-8 shadow-[0_32px_90px_-48px_rgba(34,211,238,0.6)] backdrop-blur animate-fade-in-up"
+            style={{ "--animation-delay": "380ms" } as CSSProperties}
+          >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.15),_transparent_55%)]" />
             <div className="relative space-y-6">
               <div className="flex items-center justify-between">
@@ -218,7 +248,7 @@ export default function Home() {
                   <p className="text-xs uppercase tracking-[0.4em] text-cyan-200">Live snapshot</p>
                   <h3 className="text-lg font-semibold text-white">Candidate pulse monitor</h3>
                 </div>
-                <Rocket className="h-6 w-6 text-cyan-300" />
+                <Rocket className="h-6 w-6 text-cyan-300 animate-glow" />
               </div>
               <div className="grid gap-4">
                 <div className="rounded-2xl border border-white/10 bg-black/60 p-4">
@@ -229,8 +259,12 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {featurePillars.map((pillar) => (
-                    <div key={pillar.title} className="rounded-2xl border border-white/10 bg-black/60 p-4">
+                  {featurePillars.map((pillar, index) => (
+                    <div
+                      key={pillar.title}
+                      className="rounded-2xl border border-white/10 bg-black/60 p-4 animate-fade-in-up"
+                      style={{ "--animation-delay": `${420 + index * 120}ms` } as CSSProperties}
+                    >
                       <div className="flex items-center gap-3">
                         {pillar.icon}
                         <h4 className="text-sm font-semibold text-white">{pillar.title}</h4>
@@ -246,28 +280,38 @@ export default function Home() {
 
         <section id="features" className="space-y-10">
           <div className="max-w-3xl space-y-4">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-slate-300">
-              Experience the flow
+            <span
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-slate-300 animate-fade-in-up"
+              style={{ "--animation-delay": "40ms" } as CSSProperties}
+            >
+              Designed for recruiters
             </span>
-            <h2 className="text-3xl font-semibold text-white md:text-4xl">
-              Everything your judging panel wants to see in one unified cockpit.
+            <h2
+              className="text-3xl font-semibold text-white md:text-4xl animate-fade-in-up"
+              style={{ "--animation-delay": "120ms" } as CSSProperties}
+            >
+              Everything your recruiting desk needs inside one workspace.
             </h2>
-            <p className="text-base leading-7 text-slate-300">
-              From data ingestion to stakeholder-ready storytelling, Lumina is your hackathon teammate that makes hiring
-              intelligence impossible to ignore.
+            <p
+              className="text-base leading-7 text-slate-300 animate-fade-in-up"
+              style={{ "--animation-delay": "200ms" } as CSSProperties}
+            >
+              From intake to outreach, Lumina keeps sourcing teams, hiring managers, and stakeholders aligned with
+              structured candidate insights.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {experienceHighlights.map(({ icon: Icon, title, copy }) => (
+            {experienceHighlights.map(({ icon: Icon, title, copy }, index) => (
               <div
                 key={title}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_26px_80px_-46px_rgba(34,211,238,0.6)] transition hover:-translate-y-1 hover:border-cyan-400/40"
+                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_26px_80px_-46px_rgba(34,211,238,0.6)] transition duration-500 ease-out hover:-translate-y-2 hover:shadow-[0_36px_90px_-42px_rgba(34,211,238,0.7)] hover:border-cyan-400/40 animate-fade-in-up"
+                style={{ "--animation-delay": `${index * 120}ms` } as CSSProperties}
               >
                 <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
                   <div className="absolute -top-24 right-0 h-48 w-48 rounded-full bg-[radial-gradient(circle_at_center,_rgba(34,211,238,0.22)_0%,_rgba(0,0,0,0)_70%)] blur-[110px]" />
                 </div>
-                <Icon className="relative h-7 w-7 text-cyan-200" />
+                <Icon className="relative h-7 w-7 text-cyan-200 animate-glow" />
                 <h3 className="relative mt-4 text-lg font-semibold text-white">{title}</h3>
                 <p className="relative mt-2 text-sm leading-6 text-slate-300">{copy}</p>
               </div>
@@ -277,16 +321,26 @@ export default function Home() {
 
         <section className="space-y-12" id="workflow">
           <div className="flex flex-col gap-4">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">
-              Demo-ready in three acts
+            <span
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200 animate-fade-in-up"
+              style={{ "--animation-delay": "40ms" } as CSSProperties}
+            >
+              From intake to decision
             </span>
-            <h2 className="text-3xl font-semibold text-white md:text-4xl">
-              Craft a hiring experience that feels like magic live on stage.
+            <h2
+              className="text-3xl font-semibold text-white md:text-4xl animate-fade-in-up"
+              style={{ "--animation-delay": "120ms" } as CSSProperties}
+            >
+              Keep every resume moving with a transparent, repeatable process.
             </h2>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            {workflow.map((item) => (
-              <div key={item.step} className="rounded-3xl border border-white/10 bg-white/5 p-6">
+            {workflow.map((item, index) => (
+              <div
+                key={item.step}
+                className="rounded-3xl border border-white/10 bg-white/5 p-6 animate-fade-in-up"
+                style={{ "--animation-delay": `${index * 140}ms` } as CSSProperties}
+              >
                 <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500">{item.step}</span>
                 <h3 className="mt-3 text-xl font-semibold text-white">{item.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-slate-300">{item.detail}</p>
@@ -297,38 +351,56 @@ export default function Home() {
 
         <section id="showcase" className="space-y-10">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <h2 className="text-3xl font-semibold text-white md:text-4xl">
-              Trusted by builders at the world's boldest hackathons.
+            <h2
+              className="text-3xl font-semibold text-white md:text-4xl animate-fade-in-up"
+              style={{ "--animation-delay": "60ms" } as CSSProperties}
+            >
+              Chosen by teams who live and breathe recruiting.
             </h2>
             <Button
               variant="outline"
-              className="border-white/20 bg-transparent text-slate-200 transition hover:border-cyan-400/50 hover:text-white"
+              className="border-white/20 bg-transparent text-slate-200 transition duration-500 ease-out hover:-translate-y-1 hover:border-cyan-400/50 hover:text-white animate-fade-in-up"
+              style={{ "--animation-delay": "140ms" } as CSSProperties}
             >
               Become a launch partner
             </Button>
           </div>
-          <div className="flex flex-wrap items-center gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-slate-400">
-            {partners.map((partner) => (
-              <span key={partner} className="uppercase tracking-[0.3em] text-slate-500">
-                {partner}
-              </span>
-            ))}
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 py-6">
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-black via-black/60 to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-black via-black/60 to-transparent" />
+            <div className="flex min-w-max gap-10 animate-marquee text-sm text-slate-400">
+              {marqueePartners.map((partner, index) => (
+                <span key={`${partner}-${index}`} className="uppercase tracking-[0.3em] text-slate-500">
+                  {partner}
+                </span>
+              ))}
+            </div>
           </div>
         </section>
 
         <section id="faqs" className="space-y-8">
           <div className="flex flex-col gap-4">
-            <h2 className="text-3xl font-semibold text-white md:text-4xl">
-              Frequently asked by judges and mentors alike.
+            <h2
+              className="text-3xl font-semibold text-white md:text-4xl animate-fade-in-up"
+              style={{ "--animation-delay": "40ms" } as CSSProperties}
+            >
+              Frequently asked by recruiters and hiring partners.
             </h2>
-            <p className="max-w-3xl text-base leading-7 text-slate-300">
-              Lumina is purpose-built for teams that want to demonstrate real traction fast. We handle the compliance and
-              visibility questions so you can focus on the story.
+            <p
+              className="max-w-3xl text-base leading-7 text-slate-300 animate-fade-in-up"
+              style={{ "--animation-delay": "120ms" } as CSSProperties}
+            >
+              Lumina is purpose-built for teams that juggle high-volume pipelines and nuanced roles. We handle compliance,
+              data hygiene, and reviewer visibility so you can focus on the candidate experience.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {faqs.map((faq) => (
-              <div key={faq.question} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            {faqs.map((faq, index) => (
+              <div
+                key={faq.question}
+                className="rounded-2xl border border-white/10 bg-white/5 p-5 animate-fade-in-up"
+                style={{ "--animation-delay": `${index * 150}ms` } as CSSProperties}
+              >
                 <h3 className="text-lg font-semibold text-white">{faq.question}</h3>
                 <p className="mt-3 text-sm leading-6 text-slate-300">{faq.answer}</p>
               </div>
@@ -340,18 +412,18 @@ export default function Home() {
       <footer className="border-t border-white/10 bg-black/80">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.4em] text-slate-500">Ready to build?</p>
+            <p className="text-xs uppercase tracking-[0.4em] text-slate-500">Ready to streamline?</p>
             <h2 className="text-2xl font-semibold text-white">
-              Spin up Lumina in your next hackathon and wow the judges.
+              Bring Lumina into your recruiting stack and keep every candidate conversation grounded in data.
             </h2>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button className="bg-gradient-to-r from-cyan-500 via-sky-500 to-purple-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_22px_60px_-28px_rgba(34,211,238,0.7)] transition hover:brightness-110">
+            <Button className="bg-gradient-to-r from-cyan-500 via-sky-500 to-purple-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_22px_60px_-28px_rgba(34,211,238,0.7)] transition duration-500 ease-out hover:-translate-y-1 hover:brightness-110">
               Book office hours
             </Button>
             <Button
               variant="outline"
-              className="border-white/20 bg-transparent px-6 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400/60 hover:text-white"
+              className="border-white/20 bg-transparent px-6 py-3 text-sm font-semibold text-slate-200 transition duration-500 ease-out hover:-translate-y-1 hover:border-cyan-400/60 hover:text-white"
             >
               Download pitch deck
             </Button>
