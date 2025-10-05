@@ -112,23 +112,27 @@ const faqs = [
 ];
 
 export default async function Home() {
-  const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
+  const formatNumber = (value: number) =>
+    new Intl.NumberFormat("en-US").format(value);
 
   const metrics = [
     {
       label: "Active roles",
       value: 15,
-      description: "Jobs currently tracked inside Lumina for your recruiting team.",
+      description:
+        "Jobs currently tracked inside Lumina for your recruiting team.",
     },
     {
       label: "Candidates enriched",
       value: 200,
-      description: "People with structured profiles, notes, and reviewer feedback in one view.",
+      description:
+        "People with structured profiles, notes, and reviewer feedback in one view.",
     },
     {
       label: "Resumes parsed",
       value: 50012,
-      description: "Files converted into searchable data and ready to sync with your ATS.",
+      description:
+        "Files converted into searchable data and ready to sync with your ATS.",
     },
   ];
 
@@ -162,7 +166,7 @@ export default async function Home() {
                   aria-hidden
                   className="absolute inset-[2px] z-[-1] rounded-[1.1rem] bg-black/80 backdrop-blur"
                 />
-                <span className="relative flex items-center justify-center gap-[0.2em] text-[1.4rem] font-semibold uppercase leading-none tracking-[0.08em]">
+                <span className="relative flex items-center justify-center ml-[2px] text-[1.4rem] font-semibold uppercase leading-none tracking-[0.08em]">
                   <span className="bg-gradient-to-br from-cyan-200 via-sky-400 to-emerald-300 bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(56,189,248,0.55)] transition duration-500 ease-out group-hover:drop-shadow-[0_0_22px_rgba(59,130,246,0.8)]">
                     L
                   </span>
@@ -173,8 +177,12 @@ export default async function Home() {
               </span>
             </span>
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-slate-300">Lumina</p>
-              <h1 className="text-lg font-semibold text-white">Talent Intelligence</h1>
+              <p className="text-xs uppercase tracking-[0.4em] text-slate-300">
+                Lumina
+              </p>
+              <h1 className="text-lg font-semibold text-white">
+                Talent Intelligence
+              </h1>
             </div>
           </div>
 
@@ -226,7 +234,10 @@ export default async function Home() {
       </header>
 
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-24 px-6 py-16">
-        <section id="story" className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <section
+          id="story"
+          className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center"
+        >
           <div className="space-y-6">
             <span
               className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-cyan-200 animate-fade-in-up"
@@ -238,15 +249,16 @@ export default async function Home() {
               className="text-4xl font-semibold leading-tight text-white md:text-5xl animate-fade-in-up"
               style={{ "--animation-delay": "120ms" } as CSSProperties}
             >
-              Deliver recruiter-ready intelligence the moment resumes enter the pipeline.
+              Deliver recruiter-ready intelligence the moment resumes enter the
+              pipeline.
             </h2>
             <p
               className="text-base leading-7 text-slate-300 animate-fade-in-up"
               style={{ "--animation-delay": "200ms" } as CSSProperties}
             >
-              Lumina turns raw resumes, job specs, and team feedback into narrative-rich candidate
-              profiles. Recruiters get the context they need without chasing spreadsheets or manual
-              notes.
+              Lumina turns raw resumes, job specs, and team feedback into
+              narrative-rich candidate profiles. Recruiters get the context they
+              need without chasing spreadsheets or manual notes.
             </p>
             <div
               className="flex flex-col gap-4 sm:flex-row animate-fade-in-up"
@@ -268,13 +280,21 @@ export default async function Home() {
                 <div
                   key={metric.label}
                   className="rounded-2xl border border-white/10 bg-white/5 p-4 animate-fade-in-up"
-                  style={{ "--animation-delay": `${320 + index * 120}ms` } as CSSProperties}
+                  style={
+                    {
+                      "--animation-delay": `${320 + index * 120}ms`,
+                    } as CSSProperties
+                  }
                 >
                   <dt className="text-xs uppercase tracking-[0.4em] text-slate-500">
                     {metric.label}
                   </dt>
-                  <dd className="mt-2 text-2xl font-semibold text-white">{metric.value}</dd>
-                  <p className="mt-2 text-xs leading-5 text-slate-400">{metric.description}</p>
+                  <dd className="mt-2 text-2xl font-semibold text-white">
+                    {metric.value}
+                  </dd>
+                  <p className="mt-2 text-xs leading-5 text-slate-400">
+                    {metric.description}
+                  </p>
                 </div>
               ))}
             </dl>
@@ -288,20 +308,26 @@ export default async function Home() {
             <div className="relative space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.4em] text-cyan-200">Live snapshot</p>
-                  <h3 className="text-lg font-semibold text-white">Candidate pulse monitor</h3>
+                  <p className="text-xs uppercase tracking-[0.4em] text-cyan-200">
+                    Live snapshot
+                  </p>
+                  <h3 className="text-lg font-semibold text-white">
+                    Candidate pulse monitor
+                  </h3>
                 </div>
                 <Rocket className="h-6 w-6 text-cyan-300 animate-glow" />
               </div>
               <div className="grid gap-4">
                 <div className="rounded-2xl border border-white/10 bg-black/60 p-4">
-                  <p className="text-xs uppercase tracking-[0.4em] text-slate-500">Top signal</p>
+                  <p className="text-xs uppercase tracking-[0.4em] text-slate-500">
+                    Top signal
+                  </p>
                   <h4 className="mt-2 text-lg font-semibold text-white">
                     Aria Chen · Full-Stack Architect
                   </h4>
                   <p className="mt-2 text-sm text-slate-300">
-                    AI-native platform lead who shipped LangChain-based hiring copilots across 40k
-                    resumes/day.
+                    AI-native platform lead who shipped LangChain-based hiring
+                    copilots across 40k resumes/day.
                   </p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -309,13 +335,21 @@ export default async function Home() {
                     <div
                       key={pillar.title}
                       className="rounded-2xl border border-white/10 bg-black/60 p-4 animate-fade-in-up"
-                      style={{ "--animation-delay": `${420 + index * 120}ms` } as CSSProperties}
+                      style={
+                        {
+                          "--animation-delay": `${420 + index * 120}ms`,
+                        } as CSSProperties
+                      }
                     >
                       <div className="flex items-center gap-3">
                         {pillar.icon}
-                        <h4 className="text-sm font-semibold text-white">{pillar.title}</h4>
+                        <h4 className="text-sm font-semibold text-white">
+                          {pillar.title}
+                        </h4>
                       </div>
-                      <p className="mt-2 text-xs leading-5 text-slate-400">{pillar.description}</p>
+                      <p className="mt-2 text-xs leading-5 text-slate-400">
+                        {pillar.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -342,8 +376,9 @@ export default async function Home() {
               className="text-base leading-7 text-slate-300 animate-fade-in-up"
               style={{ "--animation-delay": "200ms" } as CSSProperties}
             >
-              From intake to outreach, Lumina keeps sourcing teams, hiring managers, and
-              stakeholders aligned with structured candidate insights.
+              From intake to outreach, Lumina keeps sourcing teams, hiring
+              managers, and stakeholders aligned with structured candidate
+              insights.
             </p>
           </div>
 
@@ -352,14 +387,20 @@ export default async function Home() {
               <div
                 key={title}
                 className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_26px_80px_-46px_rgba(34,211,238,0.6)] transition duration-500 ease-out hover:-translate-y-2 hover:shadow-[0_36px_90px_-42px_rgba(34,211,238,0.7)] hover:border-cyan-400/40 animate-fade-in-up"
-                style={{ "--animation-delay": `${index * 120}ms` } as CSSProperties}
+                style={
+                  { "--animation-delay": `${index * 120}ms` } as CSSProperties
+                }
               >
                 <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
                   <div className="absolute -top-24 right-0 h-48 w-48 rounded-full bg-[radial-gradient(circle_at_center,_rgba(34,211,238,0.22)_0%,_rgba(0,0,0,0)_70%)] blur-[110px]" />
                 </div>
                 <Icon className="relative h-7 w-7 text-cyan-200 animate-glow" />
-                <h3 className="relative mt-4 text-lg font-semibold text-white">{title}</h3>
-                <p className="relative mt-2 text-sm leading-6 text-slate-300">{copy}</p>
+                <h3 className="relative mt-4 text-lg font-semibold text-white">
+                  {title}
+                </h3>
+                <p className="relative mt-2 text-sm leading-6 text-slate-300">
+                  {copy}
+                </p>
               </div>
             ))}
           </div>
@@ -385,13 +426,19 @@ export default async function Home() {
               <div
                 key={item.step}
                 className="rounded-3xl border border-white/10 bg-white/5 p-6 animate-fade-in-up"
-                style={{ "--animation-delay": `${index * 140}ms` } as CSSProperties}
+                style={
+                  { "--animation-delay": `${index * 140}ms` } as CSSProperties
+                }
               >
                 <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500">
                   {item.step}
                 </span>
-                <h3 className="mt-3 text-xl font-semibold text-white">{item.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-300">{item.detail}</p>
+                <h3 className="mt-3 text-xl font-semibold text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-slate-300">
+                  {item.detail}
+                </p>
               </div>
             ))}
           </div>
@@ -441,9 +488,10 @@ export default async function Home() {
               className="max-w-3xl text-base leading-7 text-slate-300 animate-fade-in-up"
               style={{ "--animation-delay": "120ms" } as CSSProperties}
             >
-              Lumina is purpose-built for teams that juggle high-volume pipelines and nuanced roles.
-              We handle compliance, data hygiene, and reviewer visibility so you can focus on the
-              candidate experience.
+              Lumina is purpose-built for teams that juggle high-volume
+              pipelines and nuanced roles. We handle compliance, data hygiene,
+              and reviewer visibility so you can focus on the candidate
+              experience.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -451,10 +499,16 @@ export default async function Home() {
               <div
                 key={faq.question}
                 className="rounded-2xl border border-white/10 bg-white/5 p-5 animate-fade-in-up"
-                style={{ "--animation-delay": `${index * 150}ms` } as CSSProperties}
+                style={
+                  { "--animation-delay": `${index * 150}ms` } as CSSProperties
+                }
               >
-                <h3 className="text-lg font-semibold text-white">{faq.question}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-300">{faq.answer}</p>
+                <h3 className="text-lg font-semibold text-white">
+                  {faq.question}
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-slate-300">
+                  {faq.answer}
+                </p>
               </div>
             ))}
           </div>
@@ -468,8 +522,8 @@ export default async function Home() {
               Ready to streamline?
             </p>
             <h2 className="text-2xl font-semibold text-white">
-              Bring Lumina into your recruiting stack and keep every candidate conversation grounded
-              in data.
+              Bring Lumina into your recruiting stack and keep every candidate
+              conversation grounded in data.
             </h2>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
