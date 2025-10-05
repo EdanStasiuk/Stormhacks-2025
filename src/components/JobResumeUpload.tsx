@@ -114,21 +114,39 @@ export default function JobResumeUpload({ jobId, onUploadComplete }: JobResumeUp
       files.forEach((f) => formData.append("resumes", f.file));
       formData.append("jobId", jobId);
 
+      setUploadProgress(30);
+
       // Upload files
       const response = await fetch("/api/resumes/upload", {
         method: "POST",
         body: formData,
       });
 
+      setUploadProgress(60);
+      setStage("parsing");
+      setParsingProgress(50);
+
       if (!response.ok) {
-        throw new Error("Upload failed");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Upload failed");
       }
 
       const result = await response.json();
 
+      setParsingProgress(100);
+
       if (result.success) {
         setStage("complete");
         setFiles([]);
+
+        // Show success message if there were any errors
+        if (result.errors && result.errors.length > 0) {
+          setErrors([
+            `Processed ${result.processedCount} candidates successfully.`,
+            ...result.errors.map((e: string) => `⚠️ ${e}`)
+          ]);
+        }
+
         if (onUploadComplete) {
           onUploadComplete();
         }
@@ -139,7 +157,7 @@ export default function JobResumeUpload({ jobId, onUploadComplete }: JobResumeUp
       setErrors([error.message || "Upload failed. Please try again."]);
     } finally {
       setIsUploading(false);
-      setStage("idle");
+      setTimeout(() => setStage("idle"), 1000);
     }
   };
 

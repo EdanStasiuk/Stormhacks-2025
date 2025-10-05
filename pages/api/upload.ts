@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import formidable from 'formidable';
+import formidable, { File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import unzipper from 'unzipper';
@@ -40,7 +40,7 @@ async function handleZipUpload(filePath: string) {
     return extractedFiles;
 }
 
-async function handleSinglePdfUpload(file: formidable.File): Promise<string> {
+async function handleSinglePdfUpload(file: File): Promise<string> {
     const filePath = path.join(uploadDir, file.originalFilename || file.newFilename);
     await fs.promises.rename(file.filepath, filePath);
     return filePath;
@@ -77,7 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const form = new formidable.IncomingForm({
+    const form = formidable({
         uploadDir,
         keepExtensions: true,
     });
@@ -89,7 +89,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         try {
-            const uploadedFiles = files.file as formidable.File | formidable.File[] | undefined;
+            const uploadedFiles = files.file as File | File[] | undefined;
             if (!uploadedFiles) {
                 return res.status(400).json({ error: 'No files uploaded' });
             }

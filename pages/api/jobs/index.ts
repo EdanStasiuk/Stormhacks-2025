@@ -1,9 +1,39 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/db";
+import { GoogleGenAI } from '@google/genai';
+import { pinecone } from "@/lib/pinecone";
+
+const gemini = new GoogleGenAI({
+  apiKey: process.env.GOOGLE_GEMINI_API_KEY!,
+});
+
+/**
+ * Generate embedding for text using Gemini
+ */
+async function generateEmbedding(text: string): Promise<number[]> {
+  const response = await gemini.models.embedContent({
+    model: 'gemini-embedding-001',
+    contents: [text],
+  });
+
+  if (!response.embeddings || response.embeddings.length === 0) {
+    throw new Error('Failed to generate embeddings: No embeddings returned');
+  }
+
+  const embedding = response.embeddings[0];
+
+  if (Array.isArray(embedding)) {
+    return embedding;
+  } else if (embedding && typeof embedding === 'object' && 'values' in embedding) {
+    return (embedding as any).values;
+  } else {
+    throw new Error('Failed to generate embeddings: Invalid embedding format');
+  }
+}
 
 /**
  * GET /api/jobs - Get all jobs
- * POST /api/jobs - Create a new job
+ * POST /api/jobs - Create a new job (with embedding generation)
  */
 export default async function handler(
   req: NextApiRequest,
@@ -54,12 +84,36 @@ export default async function handler(
         });
       }
 
+      // Create job in database
       const job = await prisma.job.create({
         data: {
           title,
           description: description || "",
         },
       });
+
+      // Generate and store job embedding in Pinecone
+      if (description) {
+        console.log(`📊 Generating embedding for job: ${job.id}`);
+
+        const jobText = `${title}\n\n${description}`;
+        const jobEmbedding = await generateEmbedding(jobText);
+
+        const index = pinecone.Index('candidates-job-matching');
+        await index.upsert([
+          {
+            id: `job-${job.id}`,
+            values: jobEmbedding,
+            metadata: {
+              jobId: job.id,
+              title: job.title,
+              type: 'job',
+            },
+          },
+        ]);
+
+        console.log(`✅ Job embedding stored in Pinecone: job-${job.id}`);
+      }
 
       return res.status(201).json({
         success: true,
