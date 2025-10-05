@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,61 +25,63 @@ import CandidateCard from "@/components/CandidateCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ArrowLeft, ArrowUpDown } from "lucide-react";
 
-// Mock data - replace with actual API calls
-const mockJob = {
-  id: "1",
-  title: "Senior Frontend Developer",
-  description: "We are looking for an experienced frontend developer...",
-  candidateCount: 45,
-  status: "active",
-  createdAt: "2025-10-01",
-};
+interface Candidate {
+  id: string;
+  name: string;
+  email: string;
+  overallScore: number;
+  skillScore: number;
+  experienceScore: number;
+  educationScore: number;
+  portfolio: string | null;
+  resumeUrl: string | null;
+  insights: string;
+}
 
-const mockCandidates = [
-  {
-    id: "1",
-    name: "Alice Johnson",
-    email: "alice@example.com",
-    overallScore: 95,
-    skillScore: 98,
-    experienceScore: 92,
-    educationScore: 90,
-    portfolio: "https://alice.dev",
-    resumeUrl: "/resumes/alice.pdf",
-    insights: "Strong React and TypeScript experience. 5+ years in frontend development.",
-  },
-  {
-    id: "2",
-    name: "Bob Smith",
-    email: "bob@example.com",
-    overallScore: 88,
-    skillScore: 85,
-    experienceScore: 90,
-    educationScore: 88,
-    portfolio: "https://bobsmith.com",
-    resumeUrl: "/resumes/bob.pdf",
-    insights: "Solid Vue.js background. Previous experience at FAANG companies.",
-  },
-  {
-    id: "3",
-    name: "Carol Davis",
-    email: "carol@example.com",
-    overallScore: 82,
-    skillScore: 80,
-    experienceScore: 85,
-    educationScore: 80,
-    portfolio: null,
-    resumeUrl: "/resumes/carol.pdf",
-    insights: "Good fundamentals. Strong UI/UX focus with design background.",
-  },
-];
+interface Job {
+  id: string;
+  title: string;
+  description: string;
+  candidateCount: number;
+  status: string;
+  createdAt: string;
+}
 
 export default function JobDetail() {
   const params = useParams();
   const router = useRouter();
-  const [candidates, setCandidates] = useState(mockCandidates);
+  const [job, setJob] = useState<Job | null>(null);
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<"overall" | "skills" | "experience">("overall");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const jobId = params.id as string;
+
+        // Fetch job details
+        const jobResponse = await fetch(`/api/jobs/${jobId}`);
+        const jobResult = await jobResponse.json();
+        if (jobResult.success) {
+          setJob(jobResult.data);
+        }
+
+        // Fetch candidates for this job
+        const candidatesResponse = await fetch(`/api/candidates?jobId=${jobId}`);
+        const candidatesResult = await candidatesResponse.json();
+        if (candidatesResult.success) {
+          setCandidates(candidatesResult.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [params.id]);
 
   const sortedCandidates = [...candidates].sort((a, b) => {
     if (sortBy === "overall") return b.overallScore - a.overallScore;
@@ -87,6 +89,29 @@ export default function JobDetail() {
     if (sortBy === "experience") return b.experienceScore - a.experienceScore;
     return 0;
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!job) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Job not found</p>
+          <Link href="/dashboard">
+            <Button className="mt-4">Back to Dashboard</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,10 +127,10 @@ export default function JobDetail() {
               </Link>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                  {mockJob.title}
+                  {job.title}
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  {mockJob.candidateCount} candidates screened
+                  {job.candidateCount} candidates screened
                 </p>
               </div>
             </div>
@@ -121,10 +146,10 @@ export default function JobDetail() {
             <div className="flex justify-between items-start">
               <div>
                 <CardTitle>Job Details</CardTitle>
-                <CardDescription>{mockJob.description}</CardDescription>
+                <CardDescription>{job.description}</CardDescription>
               </div>
-              <Badge variant={mockJob.status === "active" ? "default" : "secondary"}>
-                {mockJob.status}
+              <Badge variant={job.status === "active" ? "default" : "secondary"}>
+                {job.status}
               </Badge>
             </div>
           </CardHeader>
@@ -166,7 +191,13 @@ export default function JobDetail() {
         </div>
 
         {/* Candidates Display */}
-        {viewMode === "table" ? (
+        {candidates.length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-12">
+              <p className="text-muted-foreground">No candidates yet for this job.</p>
+            </CardContent>
+          </Card>
+        ) : viewMode === "table" ? (
           <Card>
             <CardHeader>
               <CardTitle>Ranked Candidates</CardTitle>
