@@ -46,7 +46,7 @@ async function main() {
       skills: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS', 'GraphQL', 'Jest', 'Storybook'],
       experience: '6 years of frontend development experience. Led frontend architecture at TechCorp (2021-present), previously Senior Developer at StartupXYZ (2018-2021). Specialized in building high-performance React applications and design systems.',
       education: 'B.S. Computer Science, Stanford University, 2017. Graduated with Honors.',
-      score: 0.92, // 92% match
+      score: 92, // 92% match
     },
   });
 
@@ -58,7 +58,7 @@ async function main() {
       skills: ['Vue.js', 'JavaScript', 'CSS', 'Webpack', 'REST APIs', 'Vuex'],
       experience: '4 years at various startups. Strong focus on performance optimization and bundle size reduction. Built multiple SPAs from scratch.',
       education: 'B.A. Computer Science, UC Berkeley, 2019',
-      score: 0.73, // 73% match - Vue vs React
+      score: 73, // 73% match - Vue vs React
     },
   });
 
@@ -70,7 +70,7 @@ async function main() {
       skills: ['React', 'JavaScript', 'HTML/CSS', 'Figma', 'UI/UX Design', 'Framer Motion'],
       experience: '3 years combining development and design work. Previously UI Engineer at DesignCo, built complete design-to-code workflows.',
       education: 'B.S. Design and Computer Science (Double Major), MIT, 2020',
-      score: 0.81, // 81% match
+      score: 81, // 81% match
     },
   });
 
@@ -83,7 +83,7 @@ async function main() {
       skills: ['Node.js', 'PostgreSQL', 'Docker', 'Kubernetes', 'AWS', 'Redis', 'RabbitMQ', 'Microservices'],
       experience: '7 years building scalable backend systems at Fortune 500 companies. Led migration to microservices architecture serving 10M+ users. Expert in distributed systems and event-driven architecture.',
       education: 'M.S. Computer Science, Carnegie Mellon University, 2016. Thesis on Distributed Systems.',
-      score: 0.95, // 95% match
+      score: 95, // 95% match
     },
   });
 
@@ -95,7 +95,7 @@ async function main() {
       skills: ['Python', 'Django', 'Redis', 'MongoDB', 'GCP', 'Apache Kafka', 'Airflow'],
       experience: '5 years backend development with focus on data pipelines and ETL processes. Built real-time data processing systems handling 1TB+ daily.',
       education: 'B.S. Software Engineering, Georgia Tech, 2018',
-      score: 0.68, // 68% match - Python vs Node.js
+      score: 68, // 68% match - Python vs Node.js
     },
   });
 
@@ -107,7 +107,7 @@ async function main() {
       skills: ['Go', 'PostgreSQL', 'gRPC', 'Docker', 'Kubernetes', 'Terraform', 'Prometheus'],
       experience: '6 years specializing in high-performance backend systems. Built low-latency trading systems and real-time analytics platforms.',
       education: 'B.S. Computer Engineering, University of Illinois, 2017',
-      score: 0.78, // 78% match - Go vs Node.js but strong DevOps
+      score: 78, // 78% match - Go vs Node.js but strong DevOps
     },
   });
 
@@ -120,7 +120,7 @@ async function main() {
       skills: ['React', 'Node.js', 'TypeScript', 'PostgreSQL', 'MongoDB', 'Next.js', 'tRPC'],
       experience: '5 years full stack development at SaaS companies. Built 3 products from MVP to scale. Strong T-shaped skills with deep expertise in TypeScript ecosystem.',
       education: 'B.S. Computer Science, UCLA, 2018',
-      score: 0.89, // 89% match
+      score: 89, // 89% match
     },
   });
 
@@ -132,7 +132,7 @@ async function main() {
       skills: ['React', 'Python', 'FastAPI', 'PostgreSQL', 'AWS', 'Docker'],
       experience: '4 years full stack with Python backend. Previously at fintech startup, built payment processing systems and admin dashboards.',
       education: 'B.S. Software Engineering, University of Waterloo, 2019',
-      score: 0.82, // 82% match
+      score: 82, // 82% match
     },
   });
 
@@ -1239,7 +1239,7 @@ async function main() {
   - MAYBE: Carol (Frontend)
 
   📈 Score Distribution:
-  - Semantic Match Scores: 0.68-0.95 (68%-95%)
+  - Semantic Match Scores: 68-95 (out of 100)
   - Portfolio Scores: 6.8-9.5 out of 10
   - Resume Alignment: 6.5-9.8 out of 10
   `);

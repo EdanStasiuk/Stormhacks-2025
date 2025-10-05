@@ -89,13 +89,17 @@ export default function JobAnalytics() {
     ? Math.round(candidates.reduce((sum, c) => sum + c.overallScore, 0) / candidates.length)
     : 0;
   const avgSkillScore = candidates.length > 0
-    ? Math.round(candidates.reduce((sum, c) => sum + c.skillScore, 0) / candidates.length)
+    ? Math.round((candidates.reduce((sum, c) => sum + c.skillScore, 0) / candidates.length) * 10) / 10 // Keep as 0-10 scale
+    : 0;
+  const avgExperienceScore = candidates.length > 0
+    ? Math.round((candidates.reduce((sum, c) => sum + c.experienceScore, 0) / candidates.length) * 10) / 10 // Keep as 0-10 scale
     : 0;
   const topCandidates = candidates.filter(c => c.overallScore >= 90);
   const strongCandidates = candidates.filter(c => c.overallScore >= 80 && c.overallScore < 90);
 
   // Prepare scatter plot data
-  const maxScore = 100;
+  const maxScore = 100; // Overall score scale
+  const maxPortfolioScore = 10; // Skills/Experience scale
   const plotWidth = 600;
   const plotHeight = 400;
   const padding = 60;
@@ -209,9 +213,9 @@ export default function JobAnalytics() {
                 viewBox={`0 0 ${plotWidth} ${plotHeight}`}
               >
                 {/* Grid lines */}
-                {[0, 25, 50, 75, 100].map((val) => {
-                  const x = padding + ((plotWidth - 2 * padding) * val) / maxScore;
-                  const y = plotHeight - padding - ((plotHeight - 2 * padding) * val) / maxScore;
+                {[0, 2.5, 5, 7.5, 10].map((val) => {
+                  const x = padding + ((plotWidth - 2 * padding) * val) / maxPortfolioScore;
+                  const y = plotHeight - padding - ((plotHeight - 2 * padding) * val) / maxPortfolioScore;
                   return (
                     <g key={val}>
                       <line
@@ -305,8 +309,8 @@ export default function JobAnalytics() {
 
                 {/* Data points */}
                 {candidates.map((candidate, idx) => {
-                  const x = padding + ((plotWidth - 2 * padding) * candidate.skillScore) / maxScore;
-                  const y = plotHeight - padding - ((plotHeight - 2 * padding) * candidate.experienceScore) / maxScore;
+                  const x = padding + ((plotWidth - 2 * padding) * candidate.skillScore) / maxPortfolioScore;
+                  const y = plotHeight - padding - ((plotHeight - 2 * padding) * candidate.experienceScore) / maxPortfolioScore;
 
                   const getColor = (score: number) => {
                     if (score >= 90) return "rgb(34, 197, 94)"; // green
@@ -347,8 +351,8 @@ export default function JobAnalytics() {
                   );
                 })}
 
-                {/* Legend */}
-                <g transform={`translate(${plotWidth - 150}, ${padding})`}>
+                {/* Legend - moved to bottom left */}
+                <g transform={`translate(${padding}, ${plotHeight - padding - 90})`}>
                   <text className="fill-current text-xs font-semibold" opacity="0.6">
                     Overall Score
                   </text>
@@ -381,23 +385,23 @@ export default function JobAnalytics() {
             <CardContent>
               <div className="space-y-6">
                 {[
-                  { label: "Overall Match", avg: avgOverallScore, max: Math.max(...candidates.map(c => c.overallScore), 0) },
-                  { label: "Skills Match", avg: avgSkillScore, max: Math.max(...candidates.map(c => c.skillScore), 0) },
-                  { label: "Experience", avg: Math.round(candidates.reduce((sum, c) => sum + c.experienceScore, 0) / candidates.length || 0), max: Math.max(...candidates.map(c => c.experienceScore), 0) },
+                  { label: "Overall Match", avg: avgOverallScore, max: Math.max(...candidates.map(c => c.overallScore), 0), scale: 100 },
+                  { label: "Skills Match", avg: avgSkillScore, max: Math.max(...candidates.map(c => c.skillScore), 0), scale: 10 },
+                  { label: "Experience", avg: avgExperienceScore, max: Math.max(...candidates.map(c => c.experienceScore), 0), scale: 10 },
                 ].map((metric) => (
                   <div key={metric.label} className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="font-medium">{metric.label}</span>
                       <span className="text-muted-foreground">
-                        Avg: {metric.avg} | Top: {metric.max}
+                        Avg: {metric.avg}/{metric.scale} | Top: {metric.max}/{metric.scale}
                       </span>
                     </div>
                     <div className="h-8 bg-muted rounded-lg overflow-hidden flex">
                       <div
                         className="bg-gradient-to-r from-primary to-primary/60 flex items-center justify-center text-xs font-semibold text-white transition-all"
-                        style={{ width: `${metric.avg}%` }}
+                        style={{ width: `${(metric.avg / metric.scale) * 100}%` }}
                       >
-                        {metric.avg}%
+                        {metric.avg}/{metric.scale}
                       </div>
                     </div>
                   </div>
