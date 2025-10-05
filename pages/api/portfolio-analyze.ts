@@ -89,12 +89,18 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: "Portfolio analysis completed and saved to database",
       data: {
         candidateId: result.candidateId,
         overallScore: result.overallScore,
         recommendation: result.recommendation,
         summary: result.summary,
+        topProjects: [], // Add actual top projects here
+        strengths: [], // Add actual strengths here
+        weaknesses: [], // Add actual weaknesses here
+        concerns: [], // Add actual concerns here
+        standoutQualities: [], // Add standout qualities here
+        resumeAlignment: 0, // Add actual alignment score here
+        technicalLevel: '', // Add actual technical level here
       },
     });
   } catch (error: any) {
