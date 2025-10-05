@@ -58,6 +58,7 @@ model Transcript {
 model Portfolio {
     id                String     @id @default(cuid())
     candidateId       String     @unique // Use as lookup key, not foreign key
+    candidate         Candidate?
     github            String? // GitHub profile link
     linkedin          String? // LinkedIn profile link
     website           String? // Personal website link
