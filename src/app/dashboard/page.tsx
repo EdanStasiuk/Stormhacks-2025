@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -85,16 +91,18 @@ export default function Dashboard() {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent group-hover:underline">
                 Lumina
               </h1>
-              <p className="text-sm text-muted-foreground">Recruiter Dashboard</p>
+              <p className="text-sm text-muted-foreground">
+                Recruiter Dashboard
+              </p>
             </Link>
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              <Link href="/dashboard/upload">
+              {/* <Link href="/dashboard/upload">
                 <Button variant="outline">Upload Resumes</Button>
-              </Link>
+              </Link> */}
               <Link href="/jobs/new">
                 <Button className="gradient-blue glow-blue">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4" />
                   New Job
                 </Button>
               </Link>
@@ -120,7 +128,9 @@ export default function Dashboard() {
 
           <Card className="border-primary/20 hover:border-primary/40 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Candidates</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Candidates
+              </CardTitle>
               <Users className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
@@ -132,11 +142,15 @@ export default function Dashboard() {
 
           <Card className="border-primary/20 hover:border-primary/40 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Recent Activity
+              </CardTitle>
               <Clock className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">{jobs.length}</div>
+              <div className="text-3xl font-bold text-primary">
+                {jobs.length}
+              </div>
               <p className="text-xs text-muted-foreground">jobs this month</p>
             </CardContent>
           </Card>
@@ -150,7 +164,9 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="text-center py-8 text-muted-foreground">Loading jobs...</div>
+              <div className="text-center py-8 text-muted-foreground">
+                Loading jobs...
+              </div>
             ) : jobs.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No jobs yet. Create your first job to get started!
@@ -175,7 +191,11 @@ export default function Dashboard() {
                         </div>
                       </Link>
                       <div className="flex items-center gap-2">
-                        <Badge variant={job.status === "active" ? "default" : "secondary"}>
+                        <Badge
+                          variant={
+                            job.status === "active" ? "default" : "secondary"
+                          }
+                        >
                           {job.status}
                         </Badge>
                         <Button
@@ -199,12 +219,17 @@ export default function Dashboard() {
         </Card>
       </main>
 
-      <AlertDialog open={!!deleteJobId} onOpenChange={() => setDeleteJobId(null)}>
+      <AlertDialog
+        open={!!deleteJobId}
+        onOpenChange={() => setDeleteJobId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Job</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this job? This will permanently delete the job and all associated candidates, resumes, transcripts, and portfolios. This action cannot be undone.
+              Are you sure you want to delete this job? This will permanently
+              delete the job and all associated candidates, resumes,
+              transcripts, and portfolios. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
