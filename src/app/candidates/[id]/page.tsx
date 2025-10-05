@@ -85,6 +85,7 @@ export default function CandidateDetail() {
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
   const [showRoadmap, setShowRoadmap] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchCandidate = async () => {
     try {
@@ -115,6 +116,34 @@ export default function CandidateDetail() {
   useEffect(() => {
     fetchCandidate();
   }, [params.id]);
+
+  const handleDeleteCandidate = async () => {
+    if (!confirm("Are you sure you want to delete this candidate? This action cannot be undone.")) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const candidateId = params.id as string;
+      const response = await fetch(`/api/candidates/${candidateId}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Redirect to job page
+        router.push(`/jobs/${candidate?.job.id}`);
+      } else {
+        alert(`Failed to delete candidate: ${result.error}`);
+        setDeleting(false);
+      }
+    } catch (error) {
+      console.error("Error deleting candidate:", error);
+      alert("Failed to delete candidate");
+      setDeleting(false);
+    }
+  };
 
   const handleAnalysisComplete = () => {
     // Refresh candidate data when analysis completes
@@ -155,9 +184,7 @@ export default function CandidateDetail() {
                 Back
               </Button>
               <div>
-                <h1 className="text-xl font-semibold">
-                  {candidate.name}
-                </h1>
+                <h1 className="text-xl font-semibold">{candidate.name}</h1>
                 <p className="text-sm text-muted-foreground">{candidate.job.title}</p>
               </div>
             </div>
@@ -330,18 +357,20 @@ export default function CandidateDetail() {
                                 {project.impressivenessLevel && (
                                   <Badge
                                     variant={
-                                      project.impressivenessLevel === 'exceptional' ? 'default' :
-                                      project.impressivenessLevel === 'strong' ? 'secondary' :
-                                      'outline'
+                                      project.impressivenessLevel === "exceptional"
+                                        ? "default"
+                                        : project.impressivenessLevel === "strong"
+                                        ? "secondary"
+                                        : "outline"
                                     }
                                     className="text-xs"
                                   >
-                                    {project.impressivenessLevel.replace('_', ' ')}
+                                    {project.impressivenessLevel.replace("_", " ")}
                                   </Badge>
                                 )}
                                 {project.resumeMatchLevel && (
                                   <Badge variant="outline" className="text-xs">
-                                    {project.resumeMatchLevel.replace(/_/g, ' ')}
+                                    {project.resumeMatchLevel.replace(/_/g, " ")}
                                   </Badge>
                                 )}
                               </div>
@@ -387,28 +416,34 @@ export default function CandidateDetail() {
                           )}
 
                           {/* Resume Claims Validated */}
-                          {project.resumeClaimsValidated && project.resumeClaimsValidated.length > 0 && (
-                            <div className="text-xs bg-green-50 dark:bg-green-950/20 p-2 rounded">
-                              <span className="font-medium text-green-700 dark:text-green-400">✓ Validates Resume Claims:</span>
-                              <ul className="list-disc list-inside ml-2 text-green-600 dark:text-green-500 mt-1">
-                                {project.resumeClaimsValidated.map((claim, i) => (
-                                  <li key={i}>{claim}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                          {project.resumeClaimsValidated &&
+                            project.resumeClaimsValidated.length > 0 && (
+                              <div className="text-xs bg-green-50 dark:bg-green-950/20 p-2 rounded">
+                                <span className="font-medium text-green-700 dark:text-green-400">
+                                  ✓ Validates Resume Claims:
+                                </span>
+                                <ul className="list-disc list-inside ml-2 text-green-600 dark:text-green-500 mt-1">
+                                  {project.resumeClaimsValidated.map((claim, i) => (
+                                    <li key={i}>{claim}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
 
                           {/* Resume Claims Contradicted */}
-                          {project.resumeClaimsContradicted && project.resumeClaimsContradicted.length > 0 && (
-                            <div className="text-xs bg-red-50 dark:bg-red-950/20 p-2 rounded">
-                              <span className="font-medium text-red-700 dark:text-red-400">✗ Contradicts Resume Claims:</span>
-                              <ul className="list-disc list-inside ml-2 text-red-600 dark:text-red-500 mt-1">
-                                {project.resumeClaimsContradicted.map((claim, i) => (
-                                  <li key={i}>{claim}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                          {project.resumeClaimsContradicted &&
+                            project.resumeClaimsContradicted.length > 0 && (
+                              <div className="text-xs bg-red-50 dark:bg-red-950/20 p-2 rounded">
+                                <span className="font-medium text-red-700 dark:text-red-400">
+                                  ✗ Contradicts Resume Claims:
+                                </span>
+                                <ul className="list-disc list-inside ml-2 text-red-600 dark:text-red-500 mt-1">
+                                  {project.resumeClaimsContradicted.map((claim, i) => (
+                                    <li key={i}>{claim}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                         </div>
                       )
                     )}
@@ -491,9 +526,7 @@ export default function CandidateDetail() {
                     <p className="text-sm text-muted-foreground">
                       Analyzing portfolio... This may take 1-3 minutes.
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      See progress roadmap above
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">See progress roadmap above</p>
                   </div>
                 )}
 
@@ -518,7 +551,8 @@ export default function CandidateDetail() {
                   <div>
                     <h3 className="font-medium text-sm mb-1.5">Strengths</h3>
                     <ul className="space-y-1 text-sm text-muted-foreground">
-                      {candidate.portfolio?.strengths && candidate.portfolio.strengths.length > 0 ? (
+                      {candidate.portfolio?.strengths &&
+                      candidate.portfolio.strengths.length > 0 ? (
                         candidate.portfolio.strengths.map((strength, index) => (
                           <li key={index} className="flex gap-2 leading-relaxed">
                             <span className="mt-1.5">·</span>
@@ -531,7 +565,8 @@ export default function CandidateDetail() {
                     </ul>
                   </div>
                 )}
-                {!showRoadmap && candidate.portfolio?.standoutQualities &&
+                {!showRoadmap &&
+                  candidate.portfolio?.standoutQualities &&
                   candidate.portfolio.standoutQualities.length > 0 && (
                     <div>
                       <h3 className="font-medium text-sm mb-1.5">Highlights</h3>
@@ -545,32 +580,36 @@ export default function CandidateDetail() {
                       </ul>
                     </div>
                   )}
-                {!showRoadmap && candidate.portfolio?.concerns && candidate.portfolio.concerns.length > 0 && (
-                  <div>
-                    <h3 className="font-medium text-sm mb-1.5">Questions</h3>
-                    <ul className="space-y-1 text-sm text-muted-foreground">
-                      {candidate.portfolio.concerns.map((concern, index) => (
-                        <li key={index} className="flex gap-2 leading-relaxed">
-                          <span className="mt-1.5">·</span>
-                          <span>{concern}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {!showRoadmap && candidate.portfolio?.weaknesses && candidate.portfolio.weaknesses.length > 0 && (
-                  <div>
-                    <h3 className="font-medium text-sm mb-1.5">Gaps</h3>
-                    <ul className="space-y-1 text-sm text-muted-foreground">
-                      {candidate.portfolio.weaknesses.map((weakness, index) => (
-                        <li key={index} className="flex gap-2 leading-relaxed">
-                          <span className="mt-1.5">·</span>
-                          <span>{weakness}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                {!showRoadmap &&
+                  candidate.portfolio?.concerns &&
+                  candidate.portfolio.concerns.length > 0 && (
+                    <div>
+                      <h3 className="font-medium text-sm mb-1.5">Questions</h3>
+                      <ul className="space-y-1 text-sm text-muted-foreground">
+                        {candidate.portfolio.concerns.map((concern, index) => (
+                          <li key={index} className="flex gap-2 leading-relaxed">
+                            <span className="mt-1.5">·</span>
+                            <span>{concern}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                {!showRoadmap &&
+                  candidate.portfolio?.weaknesses &&
+                  candidate.portfolio.weaknesses.length > 0 && (
+                    <div>
+                      <h3 className="font-medium text-sm mb-1.5">Gaps</h3>
+                      <ul className="space-y-1 text-sm text-muted-foreground">
+                        {candidate.portfolio.weaknesses.map((weakness, index) => (
+                          <li key={index} className="flex gap-2 leading-relaxed">
+                            <span className="mt-1.5">·</span>
+                            <span>{weakness}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 {!showRoadmap && candidate.portfolio?.recommendation && (
                   <div className="pt-3 border-t">
                     <div className="flex items-center justify-between">
@@ -620,6 +659,14 @@ export default function CandidateDetail() {
                     Email
                   </Button>
                 </a>
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={handleDeleteCandidate}
+                  disabled={deleting}
+                >
+                  {deleting ? "Deleting..." : "Delete Candidate"}
+                </Button>
               </CardContent>
             </Card>
           </div>
