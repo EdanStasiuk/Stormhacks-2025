@@ -39,6 +39,8 @@ model Resume {
     id          String    @id @default(cuid())
     fileUrl     String // Supabase storage URL
     parsedData  Json // Parsed resume data
+    parsedText  String? // Extracted text from the resume
+    metadata    Json?   // Additional parsed metadata
     candidateId String
     candidate   Candidate @relation(fields: [candidateId], references: [id])
     uploadedAt  DateTime  @default(now())
