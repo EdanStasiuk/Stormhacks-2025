@@ -137,7 +137,7 @@ export default async function Home() {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-black text-slate-100">
+    <div className="relative min-h-screen bg-black text-slate-100">
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/2 top-[-20%] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,_rgba(34,211,238,0.35)_0%,_rgba(0,0,0,0)_65%)] blur-[140px]" />
         <div className="absolute right-[-10%] top-[35%] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_center,_rgba(168,85,247,0.32)_0%,_rgba(0,0,0,0)_68%)] blur-[130px]" />
