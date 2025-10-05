@@ -65,17 +65,20 @@ const workflow = [
   {
     step: "01",
     title: "Upload & align",
-    detail: "Import resumes or connect your sourcing inbox, then tailor the scoring rubric to your open role.",
+    detail:
+      "Import resumes or connect your sourcing inbox, then tailor the scoring rubric to your open role.",
   },
   {
     step: "02",
     title: "Review & collaborate",
-    detail: "Share structured candidate briefs, collect feedback, and surface questions before interviews start.",
+    detail:
+      "Share structured candidate briefs, collect feedback, and surface questions before interviews start.",
   },
   {
     step: "03",
     title: "Move to outreach",
-    detail: "Export ranked lists, trigger recruiter follow-ups, and update downstream tools without duplicate work.",
+    detail:
+      "Export ranked lists, trigger recruiter follow-ups, and update downstream tools without duplicate work.",
   },
 ];
 
@@ -146,9 +149,7 @@ export default async function Home() {
                 aria-hidden
                 className="absolute -inset-4 z-[-2] rounded-[1.9rem] bg-cyan-500/25 opacity-0 blur-2xl transition duration-500 ease-out group-hover:opacity-70"
               />
-              <span
-                className="relative isolate flex h-full w-full items-center justify-center overflow-hidden rounded-[1.25rem] border border-cyan-400/40 bg-black/60 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.45)] transition duration-500 ease-out group-hover:-translate-y-1 group-hover:border-cyan-200/80 group-hover:shadow-[0_0_55px_rgba(168,85,247,0.6)] group-hover:text-white"
-              >
+              <span className="relative isolate flex h-full w-full items-center justify-center overflow-hidden rounded-[1.25rem] border border-cyan-400/40 bg-black/60 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.45)] transition duration-500 ease-out group-hover:-translate-y-1 group-hover:border-cyan-200/80 group-hover:shadow-[0_0_55px_rgba(168,85,247,0.6)] group-hover:text-white">
                 <span
                   aria-hidden
                   className="absolute inset-0 z-[-1] bg-gradient-to-br from-cyan-500/35 via-transparent to-purple-500/30 transition duration-500 ease-out group-hover:opacity-100 group-hover:brightness-110"
@@ -178,16 +179,28 @@ export default async function Home() {
           </div>
 
           <nav className="hidden items-center gap-8 text-sm text-slate-400 lg:flex">
-            <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#features">
+            <a
+              className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100"
+              href="#features"
+            >
               Features
             </a>
-            <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#workflow">
+            <a
+              className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100"
+              href="#workflow"
+            >
               Workflow
             </a>
-            <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#showcase">
+            <a
+              className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100"
+              href="#showcase"
+            >
               Showcase
             </a>
-            <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#faqs">
+            <a
+              className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100"
+              href="#faqs"
+            >
               FAQs
             </a>
           </nav>
@@ -204,7 +217,7 @@ export default async function Home() {
               className="bg-gradient-to-r from-cyan-500 via-sky-500 to-purple-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_20px_50px_-25px_rgba(34,211,238,0.65)] transition duration-500 ease-out hover:-translate-y-1 hover:brightness-110"
             >
               <Link href="/dashboard">
-                Launch demo
+                Launch
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -231,10 +244,14 @@ export default async function Home() {
               className="text-base leading-7 text-slate-300 animate-fade-in-up"
               style={{ "--animation-delay": "200ms" } as CSSProperties}
             >
-              Lumina turns raw resumes, job specs, and team feedback into narrative-rich candidate profiles. Recruiters get
-              the context they need without chasing spreadsheets or manual notes.
+              Lumina turns raw resumes, job specs, and team feedback into narrative-rich candidate
+              profiles. Recruiters get the context they need without chasing spreadsheets or manual
+              notes.
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row animate-fade-in-up" style={{ "--animation-delay": "260ms" } as CSSProperties}>
+            <div
+              className="flex flex-col gap-4 sm:flex-row animate-fade-in-up"
+              style={{ "--animation-delay": "260ms" } as CSSProperties}
+            >
               <Button className="bg-gradient-to-r from-cyan-500 via-emerald-500 to-sky-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_22px_60px_-28px_rgba(34,211,238,0.7)] transition duration-500 ease-out hover:-translate-y-1 hover:brightness-110">
                 Request a walkthrough
               </Button>
@@ -253,7 +270,9 @@ export default async function Home() {
                   className="rounded-2xl border border-white/10 bg-white/5 p-4 animate-fade-in-up"
                   style={{ "--animation-delay": `${320 + index * 120}ms` } as CSSProperties}
                 >
-                  <dt className="text-xs uppercase tracking-[0.4em] text-slate-500">{metric.label}</dt>
+                  <dt className="text-xs uppercase tracking-[0.4em] text-slate-500">
+                    {metric.label}
+                  </dt>
                   <dd className="mt-2 text-2xl font-semibold text-white">{metric.value}</dd>
                   <p className="mt-2 text-xs leading-5 text-slate-400">{metric.description}</p>
                 </div>
@@ -277,9 +296,12 @@ export default async function Home() {
               <div className="grid gap-4">
                 <div className="rounded-2xl border border-white/10 bg-black/60 p-4">
                   <p className="text-xs uppercase tracking-[0.4em] text-slate-500">Top signal</p>
-                  <h4 className="mt-2 text-lg font-semibold text-white">Aria Chen · Full-Stack Architect</h4>
+                  <h4 className="mt-2 text-lg font-semibold text-white">
+                    Aria Chen · Full-Stack Architect
+                  </h4>
                   <p className="mt-2 text-sm text-slate-300">
-                    AI-native platform lead who shipped LangChain-based hiring copilots across 40k resumes/day.
+                    AI-native platform lead who shipped LangChain-based hiring copilots across 40k
+                    resumes/day.
                   </p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -320,8 +342,8 @@ export default async function Home() {
               className="text-base leading-7 text-slate-300 animate-fade-in-up"
               style={{ "--animation-delay": "200ms" } as CSSProperties}
             >
-              From intake to outreach, Lumina keeps sourcing teams, hiring managers, and stakeholders aligned with
-              structured candidate insights.
+              From intake to outreach, Lumina keeps sourcing teams, hiring managers, and
+              stakeholders aligned with structured candidate insights.
             </p>
           </div>
 
@@ -365,7 +387,9 @@ export default async function Home() {
                 className="rounded-3xl border border-white/10 bg-white/5 p-6 animate-fade-in-up"
                 style={{ "--animation-delay": `${index * 140}ms` } as CSSProperties}
               >
-                <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500">{item.step}</span>
+                <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500">
+                  {item.step}
+                </span>
                 <h3 className="mt-3 text-xl font-semibold text-white">{item.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-slate-300">{item.detail}</p>
               </div>
@@ -394,7 +418,10 @@ export default async function Home() {
             <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-black via-black/60 to-transparent" />
             <div className="flex min-w-max gap-10 animate-marquee text-sm text-slate-400">
               {marqueePartners.map((partner, index) => (
-                <span key={`${partner}-${index}`} className="uppercase tracking-[0.3em] text-slate-500">
+                <span
+                  key={`${partner}-${index}`}
+                  className="uppercase tracking-[0.3em] text-slate-500"
+                >
                   {partner}
                 </span>
               ))}
@@ -414,8 +441,9 @@ export default async function Home() {
               className="max-w-3xl text-base leading-7 text-slate-300 animate-fade-in-up"
               style={{ "--animation-delay": "120ms" } as CSSProperties}
             >
-              Lumina is purpose-built for teams that juggle high-volume pipelines and nuanced roles. We handle compliance,
-              data hygiene, and reviewer visibility so you can focus on the candidate experience.
+              Lumina is purpose-built for teams that juggle high-volume pipelines and nuanced roles.
+              We handle compliance, data hygiene, and reviewer visibility so you can focus on the
+              candidate experience.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -436,9 +464,12 @@ export default async function Home() {
       <footer className="border-t border-white/10 bg-black/80">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.4em] text-slate-500">Ready to streamline?</p>
+            <p className="text-xs uppercase tracking-[0.4em] text-slate-500">
+              Ready to streamline?
+            </p>
             <h2 className="text-2xl font-semibold text-white">
-              Bring Lumina into your recruiting stack and keep every candidate conversation grounded in data.
+              Bring Lumina into your recruiting stack and keep every candidate conversation grounded
+              in data.
             </h2>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
