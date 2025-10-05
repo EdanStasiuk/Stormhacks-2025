@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import PortfolioAnalysisRoadmap from "@/components/PortfolioAnalysisRoadmap";
 import {
   ArrowLeft,
   Mail,
@@ -17,6 +18,7 @@ import {
   Briefcase,
   GraduationCap,
   Sparkles,
+  Loader2,
 } from "lucide-react";
 
 interface RepoAnalysis {
@@ -29,6 +31,9 @@ interface RepoAnalysis {
   technologies: string[];
   strengths: string[];
   concerns: string[];
+  matchesResumeClaims: boolean;
+  resumeClaimsValidated: string[];
+  resumeClaimsContradicted: string[];
   insights: string;
 }
 
@@ -56,6 +61,7 @@ interface Candidate {
     linkedin: string | null;
     website: string | null;
     analysisData: any;
+    analyzedAt: string | null;
     overallScore: number | null;
     resumeAlignment: number | null;
     recommendation: string | null;
@@ -78,24 +84,42 @@ export default function CandidateDetail() {
   const router = useRouter();
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showRoadmap, setShowRoadmap] = useState(false);
+
+  const fetchCandidate = async () => {
+    try {
+      const candidateId = params.id as string;
+      const response = await fetch(`/api/candidates/${candidateId}`);
+      const result = await response.json();
+      if (result.success) {
+        setCandidate(result.data);
+
+        // Check if portfolio analysis is pending
+        const hasGithub = result.data.portfolio?.github;
+        const hasAnalysis = result.data.portfolio?.analyzedAt;
+
+        // Show roadmap if has GitHub but no analysis yet
+        if (hasGithub && !hasAnalysis) {
+          setShowRoadmap(true);
+        } else {
+          setShowRoadmap(false);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch candidate:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchCandidate() {
-      try {
-        const candidateId = params.id as string;
-        const response = await fetch(`/api/candidates/${candidateId}`);
-        const result = await response.json();
-        if (result.success) {
-          setCandidate(result.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch candidate:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchCandidate();
   }, [params.id]);
+
+  const handleAnalysisComplete = () => {
+    // Refresh candidate data when analysis completes
+    fetchCandidate();
+  };
 
   if (loading) {
     return (
@@ -150,6 +174,17 @@ export default function CandidateDetail() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Portfolio Analysis Roadmap - shows if analysis is in progress */}
+          {showRoadmap && candidate.portfolio?.github && (
+            <div className="lg:col-span-3">
+              <PortfolioAnalysisRoadmap
+                jobId={candidate.job.id}
+                candidateName={candidate.name}
+                onComplete={handleAnalysisComplete}
+              />
+            </div>
+          )}
+
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Contact Info */}
@@ -275,7 +310,7 @@ export default function CandidateDetail() {
                       (project: RepoAnalysis, index: number) => (
                         <div key={index} className="border-l-2 border-primary/40 pl-4 space-y-2">
                           <div className="flex items-start justify-between">
-                            <div>
+                            <div className="flex-1">
                               <a
                                 href={project.url}
                                 target="_blank"
@@ -285,16 +320,35 @@ export default function CandidateDetail() {
                                 {project.repo}
                                 <ExternalLink className="h-3 w-3" />
                               </a>
-                              <div className="flex gap-2 mt-1">
+                              <div className="flex flex-wrap gap-1.5 mt-1.5">
                                 <Badge variant="outline" className="text-xs">
                                   Quality: {project.qualityScore}/10
                                 </Badge>
                                 <Badge variant="outline" className="text-xs">
                                   Relevance: {project.relevanceScore}/10
                                 </Badge>
+                                {project.impressivenessLevel && (
+                                  <Badge
+                                    variant={
+                                      project.impressivenessLevel === 'exceptional' ? 'default' :
+                                      project.impressivenessLevel === 'strong' ? 'secondary' :
+                                      'outline'
+                                    }
+                                    className="text-xs"
+                                  >
+                                    {project.impressivenessLevel.replace('_', ' ')}
+                                  </Badge>
+                                )}
+                                {project.resumeMatchLevel && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {project.resumeMatchLevel.replace(/_/g, ' ')}
+                                  </Badge>
+                                )}
                               </div>
                             </div>
                           </div>
+
+                          {/* Technologies */}
                           {project.technologies && project.technologies.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {project.technologies.slice(0, 5).map((tech, i) => (
@@ -304,13 +358,53 @@ export default function CandidateDetail() {
                               ))}
                             </div>
                           )}
+
+                          {/* Insights */}
                           <p className="text-sm text-muted-foreground italic">{project.insights}</p>
+
+                          {/* Strengths */}
                           {project.strengths && project.strengths.length > 0 && (
                             <div className="text-xs">
-                              <span className="font-medium text-green-600">Key strengths:</span>
+                              <span className="font-medium text-green-600">✓ Strengths:</span>
                               <ul className="list-disc list-inside ml-2 text-muted-foreground">
-                                {project.strengths.slice(0, 2).map((strength, i) => (
+                                {project.strengths.map((strength, i) => (
                                   <li key={i}>{strength}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Concerns */}
+                          {project.concerns && project.concerns.length > 0 && (
+                            <div className="text-xs">
+                              <span className="font-medium text-amber-600">⚠ Concerns:</span>
+                              <ul className="list-disc list-inside ml-2 text-muted-foreground">
+                                {project.concerns.map((concern, i) => (
+                                  <li key={i}>{concern}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Resume Claims Validated */}
+                          {project.resumeClaimsValidated && project.resumeClaimsValidated.length > 0 && (
+                            <div className="text-xs bg-green-50 dark:bg-green-950/20 p-2 rounded">
+                              <span className="font-medium text-green-700 dark:text-green-400">✓ Validates Resume Claims:</span>
+                              <ul className="list-disc list-inside ml-2 text-green-600 dark:text-green-500 mt-1">
+                                {project.resumeClaimsValidated.map((claim, i) => (
+                                  <li key={i}>{claim}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Resume Claims Contradicted */}
+                          {project.resumeClaimsContradicted && project.resumeClaimsContradicted.length > 0 && (
+                            <div className="text-xs bg-red-50 dark:bg-red-950/20 p-2 rounded">
+                              <span className="font-medium text-red-700 dark:text-red-400">✗ Contradicts Resume Claims:</span>
+                              <ul className="list-disc list-inside ml-2 text-red-600 dark:text-red-500 mt-1">
+                                {project.resumeClaimsContradicted.map((claim, i) => (
+                                  <li key={i}>{claim}</li>
                                 ))}
                               </ul>
                             </div>
@@ -331,19 +425,44 @@ export default function CandidateDetail() {
                 <CardTitle className="text-base">Scores</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Portfolio Overall Score (if available) */}
+                {candidate.portfolio?.overallScore != null && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Portfolio Quality</span>
+                      <span className="font-bold">{candidate.portfolio.overallScore}/10</span>
+                    </div>
+                    <Progress value={(candidate.portfolio.overallScore / 10) * 100} />
+                  </div>
+                )}
+
+                {/* Resume Alignment Score (if available) */}
+                {candidate.portfolio?.resumeAlignment != null && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Resume Alignment</span>
+                      <span className="font-bold">{candidate.portfolio.resumeAlignment}/10</span>
+                    </div>
+                    <Progress value={(candidate.portfolio.resumeAlignment / 10) * 100} />
+                  </div>
+                )}
+
+                {/* Semantic Match Score (from candidate.score) */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Overall</span>
+                    <span>Job Match</span>
                     <span className="font-bold">{candidate.overallScore}</span>
                   </div>
                   <Progress value={candidate.overallScore} />
                 </div>
+
+                {/* Skills Score */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Experience</span>
-                    <span className="font-bold">{candidate.experienceScore}</span>
+                    <span>Skills</span>
+                    <span className="font-bold">{candidate.skillScore}</span>
                   </div>
-                  <Progress value={candidate.experienceScore} />
+                  <Progress value={candidate.skillScore} />
                 </div>
               </CardContent>
             </Card>
@@ -351,30 +470,68 @@ export default function CandidateDetail() {
             {/* Analysis */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Analysis</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2">
+                  {showRoadmap ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      Analysis In Progress
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      Analysis
+                    </>
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {candidate.portfolio?.summary && (
+                {showRoadmap && (
+                  <div className="p-4 bg-muted/50 rounded-lg text-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      Analyzing portfolio... This may take 1-3 minutes.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      See progress roadmap above
+                    </p>
+                  </div>
+                )}
+
+                {!showRoadmap && candidate.portfolio?.summary && (
                   <div className="pb-3 border-b">
                     <p className="text-sm leading-relaxed">{candidate.portfolio.summary}</p>
                   </div>
                 )}
-                <div>
-                  <h3 className="font-medium text-sm mb-1.5">Strengths</h3>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
-                    {candidate.portfolio?.strengths && candidate.portfolio.strengths.length > 0 ? (
-                      candidate.portfolio.strengths.map((strength, index) => (
-                        <li key={index} className="flex gap-2 leading-relaxed">
-                          <span className="mt-1.5">·</span>
-                          <span>{strength}</span>
-                        </li>
-                      ))
-                    ) : (
-                      <li className="text-muted-foreground">No data available</li>
-                    )}
-                  </ul>
-                </div>
-                {candidate.portfolio?.standoutQualities &&
+
+                {!showRoadmap && !candidate.portfolio?.summary && candidate.portfolio?.github && (
+                  <div className="p-4 bg-muted/50 rounded-lg text-center text-sm text-muted-foreground">
+                    Portfolio analysis not yet available
+                  </div>
+                )}
+
+                {!showRoadmap && !candidate.portfolio?.github && (
+                  <div className="p-4 bg-muted/50 rounded-lg text-center text-sm text-muted-foreground">
+                    No GitHub portfolio provided
+                  </div>
+                )}
+                {!showRoadmap && (
+                  <div>
+                    <h3 className="font-medium text-sm mb-1.5">Strengths</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      {candidate.portfolio?.strengths && candidate.portfolio.strengths.length > 0 ? (
+                        candidate.portfolio.strengths.map((strength, index) => (
+                          <li key={index} className="flex gap-2 leading-relaxed">
+                            <span className="mt-1.5">·</span>
+                            <span>{strength}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-muted-foreground">No data available</li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+                {!showRoadmap && candidate.portfolio?.standoutQualities &&
                   candidate.portfolio.standoutQualities.length > 0 && (
                     <div>
                       <h3 className="font-medium text-sm mb-1.5">Highlights</h3>
@@ -388,7 +545,7 @@ export default function CandidateDetail() {
                       </ul>
                     </div>
                   )}
-                {candidate.portfolio?.concerns && candidate.portfolio.concerns.length > 0 && (
+                {!showRoadmap && candidate.portfolio?.concerns && candidate.portfolio.concerns.length > 0 && (
                   <div>
                     <h3 className="font-medium text-sm mb-1.5">Questions</h3>
                     <ul className="space-y-1 text-sm text-muted-foreground">
@@ -401,7 +558,7 @@ export default function CandidateDetail() {
                     </ul>
                   </div>
                 )}
-                {candidate.portfolio?.weaknesses && candidate.portfolio.weaknesses.length > 0 && (
+                {!showRoadmap && candidate.portfolio?.weaknesses && candidate.portfolio.weaknesses.length > 0 && (
                   <div>
                     <h3 className="font-medium text-sm mb-1.5">Gaps</h3>
                     <ul className="space-y-1 text-sm text-muted-foreground">
@@ -414,7 +571,7 @@ export default function CandidateDetail() {
                     </ul>
                   </div>
                 )}
-                {candidate.portfolio?.recommendation && (
+                {!showRoadmap && candidate.portfolio?.recommendation && (
                   <div className="pt-3 border-t">
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-sm">Decision</h3>
