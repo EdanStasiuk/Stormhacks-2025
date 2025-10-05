@@ -11,12 +11,7 @@
  */
 
 import { generateJSON, generateContent } from "./gemini";
-import {
-  fetchGitHubPortfolio,
-  fetchRepoReadme,
-  fetchRepoLanguages,
-  GitHubRepo,
-} from "./github";
+import { fetchGitHubPortfolio, fetchRepoReadme, fetchRepoLanguages, GitHubRepo } from "./github";
 
 // ================== TYPES ==================
 
@@ -52,8 +47,8 @@ export interface SelectedRepo {
 export interface RepoAnalysis {
   repo: string;
   url: string;
-  qualityScore: number; // 1-10 - How impressive/well-built the project is
-  relevanceScore: number; // 1-10 - How well it matches resume skills/claims
+  qualityScore: number; // 1-100 - How impressive/well-built the project is
+  relevanceScore: number; // 1-100 - How well it matches resume skills/claims
   impressivenessLevel: "exceptional" | "strong" | "good" | "average" | "weak";
   resumeMatchLevel: "perfect_match" | "strong_match" | "partial_match" | "weak_match" | "no_match";
   technologies: string[];
@@ -67,13 +62,13 @@ export interface RepoAnalysis {
 
 export interface PortfolioAnalysisResult {
   candidateId: string;
-  overallScore: number; // 1-10
+  overallScore: number; // 1-100
   summary: string;
   topProjects: RepoAnalysis[];
   strengths: string[];
   weaknesses: string[];
   concerns: string[];
-  resumeAlignment: number; // 1-10
+  resumeAlignment: number; // 1-100
   recommendation: "strong_hire" | "interview" | "maybe" | "pass";
   technicalLevel: string;
   standoutQualities: string[];
@@ -81,10 +76,7 @@ export interface PortfolioAnalysisResult {
 
 // ================== PHASE 1: CONTEXT GATHERING ==================
 
-async function phaseOneContextGathering(
-  resumeData: ResumeData,
-  jobDescription?: string
-): Promise<CandidateProfile> {
+async function phaseOneContextGathering(resumeData: ResumeData, jobDescription?: string): Promise<CandidateProfile> {
   const prompt = `You are analyzing a candidate's resume to extract their technical profile.
 
 Resume Data:
@@ -111,11 +103,7 @@ Respond with JSON only:
 
 // ================== PHASE 2: REPOSITORY DISCOVERY ==================
 
-async function phaseTwoRepositoryDiscovery(
-  repos: GitHubRepo[],
-  candidateProfile: CandidateProfile,
-  topN: number = 5
-): Promise<SelectedRepo[]> {
+async function phaseTwoRepositoryDiscovery(repos: GitHubRepo[], candidateProfile: CandidateProfile, topN: number = 5): Promise<SelectedRepo[]> {
   const repoSummaries = repos.map((repo) => ({
     name: repo.name,
     fullName: repo.full_name,
@@ -162,20 +150,14 @@ Respond with JSON only:
   ]
 }`;
 
-  const result = await generateJSON<{ selectedRepos: SelectedRepo[] }>(
-    prompt
-  );
+  const result = await generateJSON<{ selectedRepos: SelectedRepo[] }>(prompt);
 
   return result.selectedRepos.slice(0, topN);
 }
 
 // ================== PHASE 3: DEEP REPOSITORY ANALYSIS ==================
 
-async function phaseThreeDeepAnalysis(
-  selectedRepos: SelectedRepo[],
-  candidateProfile: CandidateProfile,
-  resumeData: ResumeData
-): Promise<RepoAnalysis[]> {
+async function phaseThreeDeepAnalysis(selectedRepos: SelectedRepo[], candidateProfile: CandidateProfile, resumeData: ResumeData): Promise<RepoAnalysis[]> {
   const analyses: RepoAnalysis[] = [];
 
   for (const selectedRepo of selectedRepos) {
@@ -183,10 +165,7 @@ async function phaseThreeDeepAnalysis(
 
     try {
       // Fetch detailed repo data
-      const [readme, languages] = await Promise.all([
-        fetchRepoReadme(owner, repoName),
-        fetchRepoLanguages(owner, repoName),
-      ]);
+      const [readme, languages] = await Promise.all([fetchRepoReadme(owner, repoName), fetchRepoLanguages(owner, repoName)]);
 
       const prompt = `You are conducting a deep technical analysis of a GitHub repository for candidate evaluation.
 
@@ -210,37 +189,39 @@ Candidate Profile:
 Analyze this repository comprehensively:
 
 1. **Impressiveness**: How well-built, sophisticated, and impressive is this project?
-   - Rate qualityScore (1-10) and provide impressivenessLevel: exceptional/strong/good/average/weak
+   - Rate qualityScore (1-100) and provide impressivenessLevel: exceptional/strong/good/average/weak
 
 2. **Resume Match**: How well does this project match the candidate's resume claims?
-   - Rate relevanceScore (1-10) and provide resumeMatchLevel: perfect_match/strong_match/partial_match/weak_match/no_match
+   - Rate relevanceScore (1-100) and provide resumeMatchLevel: perfect_match/strong_match/partial_match/weak_match/no_match
    - List specific resume claims this project VALIDATES (resumeClaimsValidated)
    - List specific resume claims this project CONTRADICTS (resumeClaimsContradicted)
 
 3. **Technical Analysis**:
    - Technologies used
-   - Strengths (what's impressive about it)
+   - Strengths: BE VERY SPECIFIC. Include concrete details like:
+     * Specific design patterns or architectural decisions
+     * Exact metrics (e.g., "handles 100k req/sec", "95% test coverage", "50k weekly downloads")
+     * Specific technical implementations (e.g., "implements OAuth2 with PKCE", "uses React Server Components")
+     * Production impact or usage statistics
    - Concerns or red flags
    - Overall insights
 
 Respond with JSON only:
 {
-  "qualityScore": 8,
-  "relevanceScore": 9,
+  "qualityScore": 85,
+  "relevanceScore": 92,
   "impressivenessLevel": "strong",
   "resumeMatchLevel": "strong_match",
   "technologies": ["React", "TypeScript", "Node.js"],
-  "strengths": ["Well documented", "Production ready", "Good architecture"],
+  "strengths": ["Comprehensive Storybook documentation with 50+ stories", "Production-ready with 95% test coverage using Jest and Testing Library", "Implements advanced React patterns: compound components, render props, custom hooks", "Published as npm package with 50k+ weekly downloads"],
   "concerns": ["Limited test coverage"],
   "matchesResumeClaims": true,
-  "resumeClaimsValidated": ["Claims 5 years React experience - validated by advanced React patterns", "Built scalable systems - architecture supports this"],
+  "resumeClaimsValidated": ["Claims 5 years React experience - validated by advanced React patterns like compound components and custom hooks", "Built scalable systems - npm package architecture supports tree-shaking and code splitting"],
   "resumeClaimsContradicted": [],
-  "insights": "This project demonstrates strong full-stack skills with modern tooling. The architecture shows senior-level decision making. Validates resume claims about React expertise."
+  "insights": "This project demonstrates strong full-stack skills with modern tooling. The architecture shows senior-level decision making with specific use of compound component patterns and hooks composition. Validates resume claims about React expertise with concrete evidence of advanced patterns."
 }`;
 
-      const analysis = await generateJSON<Omit<RepoAnalysis, "repo" | "url">>(
-        prompt
-      );
+      const analysis = await generateJSON<Omit<RepoAnalysis, "repo" | "url">>(prompt);
 
       analyses.push({
         repo: selectedRepo.name,
@@ -281,51 +262,45 @@ ${jobDescription ? `Job Requirements:\n${jobDescription}` : ""}
 
 Provide a comprehensive hiring assessment:
 
-1. Overall portfolio quality score (1-10)
-2. Key strengths demonstrated through projects
+1. Overall portfolio quality score (1-100)
+2. Key strengths demonstrated through projects - BE SPECIFIC with concrete examples from their GitHub
 3. Weaknesses or gaps in portfolio
 4. Any concerns or red flags
-5. Resume-portfolio alignment score (1-10)
+5. Resume-portfolio alignment score (1-100)
 6. Hiring recommendation: strong_hire | interview | maybe | pass
 7. Actual technical level demonstrated (may differ from resume claims)
-8. Standout qualities that make this candidate unique
+8. Standout qualities - BE SPECIFIC with measurable achievements from their GitHub (e.g., "Built X used by Y users", "Contributed Z PRs to popular open source project")
 
 Be honest and critical. If the portfolio doesn't match resume claims, say so.
+For strengths and standout qualities, reference SPECIFIC projects, metrics, patterns, or implementations from their GitHub.
 
 Respond with JSON only:
 {
-  "overallScore": 8.5,
+  "overallScore": 85,
   "summary": "Strong full-stack developer with proven track record...",
   "topProjects": ${JSON.stringify(repoAnalyses.slice(0, 3))},
-  "strengths": ["Strength 1", "Strength 2"],
+  "strengths": ["Exceptional React expertise demonstrated in 'design-system' repo with 95% test coverage and 50k weekly npm downloads", "Strong system design skills shown in 'microservices-framework' handling 10M+ users"],
   "weaknesses": ["Gap 1", "Gap 2"],
   "concerns": ["Concern 1"] or [],
-  "resumeAlignment": 9,
+  "resumeAlignment": 90,
   "recommendation": "interview",
   "technicalLevel": "mid-to-senior",
-  "standoutQualities": ["Quality 1", "Quality 2"]
+  "standoutQualities": ["Design system used by 500+ developers weekly (github.com/user/design-system)", "Contributed 15 PRs to React core, including performance optimization accepted in v18.2"]
 }`;
 
-  const result = await generateJSON<
-    Omit<PortfolioAnalysisResult, "candidateId">
-  >(prompt);
+  const result = await generateJSON<Omit<PortfolioAnalysisResult, "candidateId">>(prompt);
 
   return result;
 }
 
 // ================== MAIN ORCHESTRATOR ==================
 
-export async function analyzePortfolio(
-  input: PortfolioAnalysisInput
-): Promise<PortfolioAnalysisResult> {
+export async function analyzePortfolio(input: PortfolioAnalysisInput): Promise<PortfolioAnalysisResult> {
   console.log(`\n🤖 Starting agentic portfolio analysis for candidate ${input.candidateId}`);
 
   // PHASE 1: Context Gathering
   console.log("\n📋 Phase 1: Context Gathering");
-  const candidateProfile = await phaseOneContextGathering(
-    input.resumeData,
-    input.jobDescription
-  );
+  const candidateProfile = await phaseOneContextGathering(input.resumeData, input.jobDescription);
   console.log("✅ Candidate profile extracted:", candidateProfile);
 
   let repoAnalyses: RepoAnalysis[] = [];
@@ -336,30 +311,20 @@ export async function analyzePortfolio(
     const githubData = await fetchGitHubPortfolio(input.github);
     console.log(`Found ${githubData.repos.length} repositories`);
 
-    const selectedRepos = await phaseTwoRepositoryDiscovery(
-      githubData.repos,
-      candidateProfile,
-      5
+    const selectedRepos = await phaseTwoRepositoryDiscovery(githubData.repos, candidateProfile, 5);
+    console.log(
+      `✅ Selected ${selectedRepos.length} top repositories:`,
+      selectedRepos.map((r) => r.name)
     );
-    console.log(`✅ Selected ${selectedRepos.length} top repositories:`, selectedRepos.map(r => r.name));
 
     console.log("\n🔬 Phase 3: Deep Repository Analysis");
-    repoAnalyses = await phaseThreeDeepAnalysis(
-      selectedRepos,
-      candidateProfile,
-      input.resumeData
-    );
+    repoAnalyses = await phaseThreeDeepAnalysis(selectedRepos, candidateProfile, input.resumeData);
     console.log(`✅ Analyzed ${repoAnalyses.length} repositories`);
   }
 
   // PHASE 4: Final Synthesis
   console.log("\n🎯 Phase 4: Final Synthesis");
-  const finalAssessment = await phaseFourFinalSynthesis(
-    candidateProfile,
-    repoAnalyses,
-    input.resumeData,
-    input.jobDescription
-  );
+  const finalAssessment = await phaseFourFinalSynthesis(candidateProfile, repoAnalyses, input.resumeData, input.jobDescription);
   console.log("✅ Final assessment complete");
 
   const result: PortfolioAnalysisResult = {

@@ -40,7 +40,7 @@ model Resume {
     fileUrl     String // Supabase storage URL
     parsedData  Json // Parsed resume data
     parsedText  String? // Extracted text from the resume
-    metadata    Json?   // Additional parsed metadata
+    metadata    Json? // Additional parsed metadata
     candidateId String
     candidate   Candidate @relation(fields: [candidateId], references: [id])
     uploadedAt  DateTime  @default(now())
@@ -63,8 +63,8 @@ model Portfolio {
     linkedin          String? // LinkedIn profile link
     website           String? // Personal website link
     analysisData      Json? // Full AI analysis result
-    overallScore      Float? // 1-10 score
-    resumeAlignment   Float? // 1-10 alignment score
+    overallScore      Float? // 1-100 score
+    resumeAlignment   Float? // 1-100 alignment score
     recommendation    String? // strong_hire | interview | maybe | pass
     technicalLevel    String? // Assessed technical level
     summary           String? // Executive summary
