@@ -24,7 +24,7 @@ import {
 import CandidateCard from "@/components/CandidateCard";
 import JobResumeUpload from "@/components/JobResumeUpload";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ArrowLeft, ArrowUpDown, UserPlus, UserMinus } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, UserPlus, UserMinus, BarChart3 } from "lucide-react";
 
 interface Candidate {
   id: string;
@@ -152,7 +152,19 @@ export default function JobDetail() {
                 </p>
               </div>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              <Link href={`/jobs/${job.id}/analytics`}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 border-primary/30 hover:bg-primary/10"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  Analytics
+                </Button>
+              </Link>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
