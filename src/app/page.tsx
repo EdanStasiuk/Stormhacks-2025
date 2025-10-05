@@ -19,6 +19,11 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
+              <Link href="/landing">
+                <Button variant="outline" className="border-primary/30 hover:bg-primary/10">
+                  About
+                </Button>
+              </Link>
               <Link href="/dashboard">
                 <Button className="gradient-blue glow-blue">
                   <LayoutDashboard className="h-4 w-4 mr-2" />
