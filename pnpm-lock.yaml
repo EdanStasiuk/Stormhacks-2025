@@ -59,9 +59,15 @@ importers:
       next:
         specifier: 15.5.4
         version: 15.5.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      openai:
+        specifier: ^6.1.0
+        version: 6.1.0(ws@8.18.3)
       pdf-parse:
         specifier: ^2.1.7
         version: 2.1.7
+      pnpm:
+        specifier: ^10.18.0
+        version: 10.18.0
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -106,7 +112,7 @@ importers:
         specifier: ^0.4.23
         version: 0.4.23(eslint@9.37.0(jiti@2.6.1))
       prisma:
-        specifier: 6.16.3
+        specifier: ^6.16.3
         version: 6.16.3(typescript@5.9.3)
       tailwindcss:
         specifier: ^4
@@ -2406,6 +2412,18 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
+  openai@6.1.0:
+    resolution: {integrity: sha512-5sqb1wK67HoVgGlsPwcH2bUbkg66nnoIYKoyV9zi5pZPqh7EWlmSrSDjAh4O5jaIg/0rIlcDKBtWvZBuacmGZg==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
@@ -2464,6 +2482,11 @@ packages:
 
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
+
+  pnpm@10.18.0:
+    resolution: {integrity: sha512-6AT4ifHOzEDVctsITuw+SIFzn43sacD/ENLRvv+aTjCTg7ontbdQBZ1/TBSVNbbNDSyx7Trrc5I5pChKaPQM+g==}
+    engines: {node: '>=18.12'}
+    hasBin: true
 
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -5234,6 +5257,10 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
+  openai@6.1.0(ws@8.18.3):
+    optionalDependencies:
+      ws: 8.18.3
+
   optionator@0.9.4:
     dependencies:
       deep-is: 0.1.4
@@ -5290,6 +5317,8 @@ snapshots:
       confbox: 0.2.2
       exsolve: 1.0.7
       pathe: 2.0.3
+
+  pnpm@10.18.0: {}
 
   possible-typed-array-names@1.1.0: {}
 

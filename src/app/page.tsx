@@ -19,19 +19,19 @@ import { Button } from "@/components/ui/button";
 
 const featurePillars = [
   {
-    icon: <Sparkles className="h-6 w-6 text-cyan-300 animate-float-slow" />,
+    icon: <Sparkles className="h-6 w-6 text-cyan-300" />,
     title: "Structured candidate briefs",
     description:
       "Instant summaries that highlight role fit, recent wins, and must-know context for recruiters.",
   },
   {
-    icon: <Workflow className="h-6 w-6 text-purple-300 animate-float-slow" />,
+    icon: <Workflow className="h-6 w-6 text-purple-300" />,
     title: "Adaptive assignment flows",
     description:
       "Route resumes to the right reviewer, capture feedback, and keep conversations in one thread.",
   },
   {
-    icon: <BadgeCheck className="h-6 w-6 text-blue-300 animate-float-slow" />,
+    icon: <BadgeCheck className="h-6 w-6 text-blue-300" />,
     title: "Transparent scoring",
     description:
       "Explainable match criteria show the skills, tenure, and achievements that influence every rank.",
@@ -130,7 +130,7 @@ export default async function Home() {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-slate-100">
+    <div className="relative min-h-screen overflow-x-hidden bg-black text-slate-100">
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/2 top-[-20%] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,_rgba(34,211,238,0.35)_0%,_rgba(0,0,0,0)_65%)] blur-[140px]" />
         <div className="absolute right-[-10%] top-[35%] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_center,_rgba(168,85,247,0.32)_0%,_rgba(0,0,0,0)_68%)] blur-[130px]" />
@@ -140,20 +140,44 @@ export default async function Home() {
 
       <header className="sticky top-0 z-20 border-b border-white/10 bg-black/70 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-cyan-400/40 bg-cyan-500/15 text-sm font-semibold uppercase tracking-[0.3em] text-cyan-200 shadow-[0_0_35px_rgba(34,211,238,0.45)]">
-              LT
+          <div className="group flex items-center gap-3">
+            <span className="relative flex h-12 w-12 items-center justify-center">
+              <span
+                aria-hidden
+                className="absolute -inset-4 z-[-2] rounded-[1.9rem] bg-cyan-500/25 opacity-0 blur-2xl transition duration-500 ease-out group-hover:opacity-70"
+              />
+              <span
+                className="relative isolate flex h-full w-full items-center justify-center overflow-hidden rounded-[1.25rem] border border-cyan-400/40 bg-black/60 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.45)] transition duration-500 ease-out group-hover:-translate-y-1 group-hover:border-cyan-200/80 group-hover:shadow-[0_0_55px_rgba(168,85,247,0.6)] group-hover:text-white"
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-0 z-[-1] bg-gradient-to-br from-cyan-500/35 via-transparent to-purple-500/30 transition duration-500 ease-out group-hover:opacity-100 group-hover:brightness-110"
+                />
+                <span
+                  aria-hidden
+                  className="absolute inset-0 z-[-2] animate-spin-slower bg-[conic-gradient(from_140deg,_transparent_0deg,_rgba(34,211,238,0.4)_140deg,_rgba(168,85,247,0.22)_220deg,_transparent_360deg)] opacity-70 transition duration-[1200ms] group-hover:opacity-90 group-hover:[animation-duration:1.8s]"
+                />
+                <span
+                  aria-hidden
+                  className="absolute inset-[2px] z-[-1] rounded-[1.1rem] bg-black/80 backdrop-blur"
+                />
+                <span className="relative flex items-center justify-center gap-[0.2em] text-[1.4rem] font-semibold uppercase leading-none tracking-[0.08em]">
+                  <span className="bg-gradient-to-br from-cyan-200 via-sky-400 to-emerald-300 bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(56,189,248,0.55)] transition duration-500 ease-out group-hover:drop-shadow-[0_0_22px_rgba(59,130,246,0.8)]">
+                    L
+                  </span>
+                  <span className="bg-gradient-to-br from-purple-300 via-sky-400 to-cyan-100 bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(168,85,247,0.45)] transition duration-500 ease-out group-hover:drop-shadow-[0_0_22px_rgba(168,85,247,0.7)]">
+                    T
+                  </span>
+                </span>
+              </span>
             </span>
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-slate-500">Lumina</p>
+              <p className="text-xs uppercase tracking-[0.4em] text-slate-300">Lumina</p>
               <h1 className="text-lg font-semibold text-white">Talent Intelligence</h1>
             </div>
           </div>
 
           <nav className="hidden items-center gap-8 text-sm text-slate-400 lg:flex">
-            <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#story">
-              Story
-            </a>
             <a className="relative transition hover:text-cyan-200 after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cyan-400 after:transition-transform after:duration-300 hover:after:scale-x-100" href="#features">
               Features
             </a>
@@ -278,7 +302,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="features" className="space-y-10">
+        <section id="features" className="space-y-10 scroll-mt-24">
           <div className="max-w-3xl space-y-4">
             <span
               className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-slate-300 animate-fade-in-up"
@@ -319,7 +343,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="space-y-12" id="workflow">
+        <section className="space-y-12 scroll-mt-24" id="workflow">
           <div className="flex flex-col gap-4">
             <span
               className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200 animate-fade-in-up"
@@ -349,7 +373,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="showcase" className="space-y-10">
+        <section id="showcase" className="space-y-10 scroll-mt-24">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <h2
               className="text-3xl font-semibold text-white md:text-4xl animate-fade-in-up"
@@ -378,7 +402,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="faqs" className="space-y-8">
+        <section id="faqs" className="space-y-8 scroll-mt-24">
           <div className="flex flex-col gap-4">
             <h2
               className="text-3xl font-semibold text-white md:text-4xl animate-fade-in-up"
