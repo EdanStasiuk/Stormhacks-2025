@@ -285,9 +285,9 @@ export default function CandidateDetail() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="font-medium">Overall Skill Match</span>
-                      <span className="text-muted-foreground">{candidate.skillScore}%</span>
+                      <span className="text-muted-foreground">{candidate.skillScore}/10</span>
                     </div>
-                    <Progress value={candidate.skillScore} />
+                    <Progress value={(candidate.skillScore / 10) * 100} />
                   </div>
                 </div>
               </CardContent>
@@ -481,24 +481,6 @@ export default function CandidateDetail() {
                     <Progress value={(candidate.portfolio.resumeAlignment / 10) * 100} />
                   </div>
                 )}
-
-                {/* Semantic Match Score (from candidate.score) */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Job Match</span>
-                    <span className="font-bold">{candidate.overallScore}</span>
-                  </div>
-                  <Progress value={candidate.overallScore} />
-                </div>
-
-                {/* Skills Score */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Skills</span>
-                    <span className="font-bold">{candidate.skillScore}</span>
-                  </div>
-                  <Progress value={candidate.skillScore} />
-                </div>
               </CardContent>
             </Card>
 
