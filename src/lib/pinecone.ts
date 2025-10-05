@@ -18,4 +18,28 @@ async function testPineconeConnection() {
 }
 
 // Uncomment the line below to test the connection
-testPineconeConnection();
+// testPineconeConnection();
+
+async function createStarterIndex() {
+    try {
+        const indexName = 'job-matching-index';
+
+        await pinecone.createIndexForModel({
+            name: indexName,
+            cloud: 'aws',
+            region: 'us-east-1',
+            embed: {
+                model: 'llama-text-embed-v2',
+                fieldMap: { text: 'chunk_text' },
+            },
+            waitUntilReady: true,
+        });
+
+        console.log(`Index "${indexName}" created successfully.`);
+    } catch (error) {
+        console.error('Error creating starter index:', error);
+    }
+}
+
+// Uncomment the line below to create the starter index
+// createStarterIndex();
