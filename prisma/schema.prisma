@@ -56,12 +56,22 @@ model Transcript {
 }
 
 model Portfolio {
-    id        String     @id @default(cuid())
-    github    String? // GitHub profile link
-    linkedin  String? // LinkedIn profile link
-    website   String? // Personal website link
-    analysis  Json? // AI analysis data
-    candidate Candidate?
-    createdAt DateTime   @default(now())
-    updatedAt DateTime   @updatedAt
+    id                String     @id @default(cuid())
+    candidateId       String     @unique // Use as lookup key, not foreign key
+    github            String? // GitHub profile link
+    linkedin          String? // LinkedIn profile link
+    website           String? // Personal website link
+    analysisData      Json? // Full AI analysis result
+    overallScore      Float? // 1-10 score
+    resumeAlignment   Float? // 1-10 alignment score
+    recommendation    String? // strong_hire | interview | maybe | pass
+    technicalLevel    String? // Assessed technical level
+    summary           String? // Executive summary
+    strengths         String[] // Key strengths
+    weaknesses        String[] // Weaknesses/gaps
+    concerns          String[] // Red flags
+    standoutQualities String[] // Unique qualities
+    analyzedAt        DateTime? // When analysis was performed
+    createdAt         DateTime   @default(now())
+    updatedAt         DateTime   @updatedAt
 }
