@@ -47,10 +47,10 @@ export default async function handler(
     try {
       const { title, description } = req.body;
 
-      if (!title) {
+      if (!title || !description) {
         return res.status(400).json({
           success: false,
-          error: "Title is required",
+          error: "Title and description are required.",
         });
       }
 
