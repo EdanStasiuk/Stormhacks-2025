@@ -18,20 +18,18 @@ model Job {
 }
 
 model Candidate {
-    id          String     @id @default(cuid())
-    name        String
-    email       String     @unique
-    skills      String[] // Array of skills
-    experience  String // Experience details
-    education   String // Education details
-    portfolio   Portfolio? @relation(fields: [portfolioId], references: [id])
-    portfolioId String?    @unique
-    resumes     Resume[]
-    jobId       String
-    job         Job        @relation(fields: [jobId], references: [id])
-    score       Float? // Semantic match score
-    createdAt   DateTime   @default(now())
-    updatedAt   DateTime   @updatedAt
+    id         String   @id @default(cuid())
+    name       String
+    email      String   @unique
+    skills     String[] // Array of skills
+    experience String // Experience details
+    education  String // Education details
+    resumes    Resume[]
+    jobId      String
+    job        Job      @relation(fields: [jobId], references: [id])
+    score      Float? // Semantic match score
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 }
 
 model Resume {
@@ -44,12 +42,22 @@ model Resume {
 }
 
 model Portfolio {
-    id        String     @id @default(cuid())
-    github    String? // GitHub profile link
-    linkedin  String? // LinkedIn profile link
-    website   String? // Personal website link
-    analysis  Json? // AI analysis data
-    candidate Candidate?
-    createdAt DateTime   @default(now())
-    updatedAt DateTime   @updatedAt
+    id                String     @id @default(cuid())
+    candidateId       String     @unique // Use as lookup key, not foreign key
+    github            String? // GitHub profile link
+    linkedin          String? // LinkedIn profile link
+    website           String? // Personal website link
+    analysisData      Json? // Full AI analysis result
+    overallScore      Float? // 1-10 score
+    resumeAlignment   Float? // 1-10 alignment score
+    recommendation    String? // strong_hire | interview | maybe | pass
+    technicalLevel    String? // Assessed technical level
+    summary           String? // Executive summary
+    strengths         String[] // Key strengths
+    weaknesses        String[] // Weaknesses/gaps
+    concerns          String[] // Red flags
+    standoutQualities String[] // Unique qualities
+    analyzedAt        DateTime? // When analysis was performed
+    createdAt         DateTime   @default(now())
+    updatedAt         DateTime   @updatedAt
 }
