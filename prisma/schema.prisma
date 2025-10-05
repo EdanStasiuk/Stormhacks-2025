@@ -18,24 +18,38 @@ model Job {
 }
 
 model Candidate {
-    id         String   @id @default(cuid())
-    name       String
-    email      String   @unique
-    skills     String[] // Array of skills
-    experience String // Experience details
-    education  String // Education details
-    resumes    Resume[]
-    jobId      String
-    job        Job      @relation(fields: [jobId], references: [id])
-    score      Float? // Semantic match score
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+    id          String       @id @default(cuid())
+    name        String
+    email       String       @unique
+    skills      String[] // Array of skills
+    experience  String // Experience details
+    education   String // Education details
+    portfolio   Portfolio?   @relation(fields: [portfolioId], references: [id])
+    portfolioId String?      @unique
+    resumes     Resume[]
+    jobId       String
+    job         Job          @relation(fields: [jobId], references: [id])
+    score       Float? // Semantic match score
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+    transcripts Transcript[]
 }
 
 model Resume {
     id          String    @id @default(cuid())
     fileUrl     String // Supabase storage URL
     parsedData  Json // Parsed resume data
+    parsedText  String? // Extracted text from the resume
+    metadata    Json?   // Additional parsed metadata
+    candidateId String
+    candidate   Candidate @relation(fields: [candidateId], references: [id])
+    uploadedAt  DateTime  @default(now())
+}
+
+model Transcript {
+    id          String    @id @default(cuid())
+    fileUrl     String // Supabase storage URL
+    parsedData  Json // Parsed transcript data
     candidateId String
     candidate   Candidate @relation(fields: [candidateId], references: [id])
     uploadedAt  DateTime  @default(now())
