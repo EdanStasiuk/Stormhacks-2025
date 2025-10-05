@@ -94,13 +94,13 @@ export default async function handler(
         overallScore: result.overallScore,
         recommendation: result.recommendation,
         summary: result.summary,
-        topProjects: [], // Add actual top projects here
-        strengths: [], // Add actual strengths here
-        weaknesses: [], // Add actual weaknesses here
-        concerns: [], // Add actual concerns here
-        standoutQualities: [], // Add standout qualities here
-        resumeAlignment: 0, // Add actual alignment score here
-        technicalLevel: '', // Add actual technical level here
+        topProjects: result.topProjects,
+        strengths: result.strengths,
+        weaknesses: result.weaknesses,
+        concerns: result.concerns,
+        standoutQualities: result.standoutQualities,
+        resumeAlignment: result.resumeAlignment,
+        technicalLevel: result.technicalLevel,
       },
     });
   } catch (error: any) {

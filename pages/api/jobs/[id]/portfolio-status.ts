@@ -58,11 +58,6 @@ export default async function handler(
     const candidatesWithGithub = candidates.filter(c => c.portfolio?.github).length;
     const candidatesAnalyzed = candidates.filter(c => c.portfolio?.analyzedAt).length;
 
-    // Calculate top 10%
-    const topCount = Math.max(1, Math.min(10, Math.ceil(totalCandidates * 0.1)));
-    const topCandidates = candidates.slice(0, topCount);
-    const topWithGithub = topCandidates.filter(c => c.portfolio?.github);
-
     const candidateDetails = candidates.map(c => ({
       id: c.id,
       name: c.name,
@@ -85,8 +80,7 @@ export default async function handler(
         candidatesWithPortfolio,
         candidatesWithGithub,
         candidatesAnalyzed,
-        top10PercentCount: topCount,
-        top10PercentWithGithub: topWithGithub.length,
+        pendingAnalysis: candidatesWithGithub - candidatesAnalyzed,
       },
       candidates: candidateDetails,
     });

@@ -190,6 +190,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
 
       const processedCandidates: string[] = [];
+      const candidatesWithGithub: Array<{ candidateId: string; name: string; github: string; resumeData: any }> = [];
       const errors: string[] = [];
 
       // Process each resume
@@ -255,23 +256,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           // 5b. Create/update portfolio if URLs found in resume
           if (parsedData.github || parsedData.linkedin || parsedData.website) {
-            await prisma.portfolio.upsert({
+            const portfolio = await prisma.portfolio.upsert({
               where: {
                 candidateId: candidate.id,
               },
               update: {
-                github: parsedData.github || undefined,
-                linkedin: parsedData.linkedin || undefined,
-                website: parsedData.website || undefined,
+                github: parsedData.github || null,
+                linkedin: parsedData.linkedin || null,
+                website: parsedData.website || null,
               },
               create: {
                 candidateId: candidate.id,
-                github: parsedData.github || undefined,
-                linkedin: parsedData.linkedin || undefined,
-                website: parsedData.website || undefined,
+                github: parsedData.github || null,
+                linkedin: parsedData.linkedin || null,
+                website: parsedData.website || null,
               },
             });
-            console.log(`  ✅ Portfolio URLs: ${parsedData.github ? '✓GitHub ' : ''}${parsedData.linkedin ? '✓LinkedIn ' : ''}${parsedData.website ? '✓Website' : ''}`);
+            console.log(`  ✅ Portfolio created/updated:`);
+            console.log(`     GitHub: ${portfolio.github || 'none'}`);
+            console.log(`     LinkedIn: ${portfolio.linkedin || 'none'}`);
+            console.log(`     Website: ${portfolio.website || 'none'}`);
+
+            // Track candidates with GitHub for portfolio analysis
+            if (portfolio.github) {
+              candidatesWithGithub.push({
+                candidateId: candidate.id,
+                name: candidate.name,
+                github: portfolio.github,
+                resumeData: parsedData,
+              });
+            }
           }
 
           // 6. Create resume record (storing parsed data only, not file)
@@ -356,116 +370,68 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
 
-      // 9. Analyze top 10% of candidates with portfolio analysis
-      if (processedCandidates.length > 0) {
-        console.log(`\n🎯 Starting portfolio analysis for top 10% of candidates...`);
+      // 9. Start portfolio analysis in background (async, don't wait)
+      if (candidatesWithGithub.length > 0) {
+        console.log(`\n🎯 Queuing portfolio analysis for ${candidatesWithGithub.length} candidates with GitHub URLs...`);
 
-        updateProcessingStatus(
-          jobId,
-          'portfolio_analysis',
-          'Analyzing top 10% of candidates'
-        );
+        // Run analysis in background without blocking the response
+        setImmediate(async () => {
+          updateProcessingStatus(
+            jobId,
+            'portfolio_analysis',
+            `Analyzing ${candidatesWithGithub.length} candidates with GitHub URLs`
+          );
 
-        try {
-          // Fetch all candidates for this job, sorted by score
-          const allCandidates = await prisma.candidate.findMany({
-            where: {
-              jobId: jobId,
-              score: {
-                not: null,
-              },
-            },
-            orderBy: {
-              score: 'desc',
-            },
-            include: {
-              portfolio: true,
-              resumes: {
-                take: 1,
-                orderBy: {
-                  uploadedAt: 'desc',
-                },
-              },
-            },
-          });
+          try {
+            let analyzedCount = 0;
 
-          console.log(`  📊 Total candidates with scores: ${allCandidates.length}`);
+            for (let idx = 0; idx < candidatesWithGithub.length; idx++) {
+              const candidateData = candidatesWithGithub[idx];
 
-          // Calculate top 10% (minimum 1, maximum 10)
-          const topCount = Math.max(1, Math.min(10, Math.ceil(allCandidates.length * 0.1)));
-          const topCandidates = allCandidates.slice(0, topCount);
-
-          const topWithGithub = topCandidates.filter(c => c.portfolio?.github);
-
-          console.log(`  🏆 Top ${topCount} candidates (${Math.round((topCount / allCandidates.length) * 100)}%)`);
-          console.log(`  🔗 ${topWithGithub.length} have GitHub URLs and will be analyzed`);
-
-          if (topWithGithub.length === 0) {
-            console.log(`  ⚠️  No candidates in top ${topCount} have GitHub URLs - skipping portfolio analysis`);
-          }
-
-          let analyzedCount = 0;
-          let skippedCount = 0;
-
-          for (let idx = 0; idx < topCandidates.length; idx++) {
-            const candidate = topCandidates[idx];
-
-            updateProcessingStatus(
-              jobId,
-              'portfolio_analysis',
-              `Analyzing candidate ${idx + 1}/${topCandidates.length}: ${candidate.name}`,
-              { current: idx + 1, total: topCandidates.length }
-            );
-            try {
-              // Check if portfolio exists and has GitHub URL
-              const githubUrl = candidate.portfolio?.github;
-
-              if (!githubUrl) {
-                console.log(`  ⏭️  Skipping ${candidate.name} - no GitHub URL in portfolio`);
-                skippedCount++;
-                continue;
-              }
-
-              console.log(`\n  🔬 Analyzing ${candidate.name} (score: ${candidate.score?.toFixed(3)})`);
-              console.log(`     GitHub: ${githubUrl}`);
-              console.log(`     This may take 30-60 seconds per candidate...`);
-
-              // Get resume data
-              const latestResume = candidate.resumes[0];
-              const resumeData = latestResume?.parsedData as any || {
-                skills: candidate.skills,
-                experience: [candidate.experience],
-                rawText: latestResume?.parsedText || "",
-              };
-
-              // Run portfolio analysis
-              const analysisResult = await analyzePortfolio({
-                candidateId: candidate.id,
-                resumeData: resumeData,
-                github: githubUrl,
-                jobDescription: job.description || undefined,
-              });
-
-              // Save analysis
-              await savePortfolioAnalysis(candidate.id, githubUrl, analysisResult);
-
-              console.log(
-                `  ✅ Analysis complete - Overall: ${analysisResult.overallScore}/10, Recommendation: ${analysisResult.recommendation}`
+              updateProcessingStatus(
+                jobId,
+                'portfolio_analysis',
+                `Analyzing candidate ${idx + 1}/${candidatesWithGithub.length}: ${candidateData.name}`,
+                { current: idx + 1, total: candidatesWithGithub.length }
               );
 
-              analyzedCount++;
-            } catch (error: any) {
-              console.error(`  ❌ Error analyzing ${candidate.name}:`, error.message);
-              errors.push(`Portfolio analysis for ${candidate.name}: ${error.message}`);
-              skippedCount++;
-            }
-          }
+              try {
+                console.log(`\n  🔬 Analyzing ${candidateData.name}`);
+                console.log(`     GitHub: ${candidateData.github}`);
+                console.log(`     This may take 30-60 seconds per candidate...`);
 
-          console.log(`  ✨ Portfolio analysis complete: ${analyzedCount} analyzed, ${skippedCount} skipped`);
-        } catch (error: any) {
-          console.error('Error during portfolio analysis:', error);
-          errors.push(`Portfolio analysis error: ${error.message}`);
-        }
+                // Run portfolio analysis
+                const analysisResult = await analyzePortfolio({
+                  candidateId: candidateData.candidateId,
+                  resumeData: candidateData.resumeData,
+                  github: candidateData.github,
+                  jobDescription: job.description || undefined,
+                });
+
+                // Save analysis
+                await savePortfolioAnalysis(candidateData.candidateId, candidateData.github, analysisResult);
+
+                console.log(
+                  `  ✅ Analysis complete - Overall: ${analysisResult.overallScore}/10, Recommendation: ${analysisResult.recommendation}`
+                );
+
+                analyzedCount++;
+              } catch (error: any) {
+                console.error(`  ❌ Error analyzing ${candidateData.name}:`, error.message);
+              }
+            }
+
+            console.log(`  ✨ Portfolio analysis complete: ${analyzedCount} analyzed`);
+            updateProcessingStatus(jobId, 'complete', `Portfolio analysis complete: ${analyzedCount} analyzed`);
+          } catch (error: any) {
+            console.error('Error during portfolio analysis:', error);
+            setProcessingError(jobId, error.message);
+          }
+        });
+
+        console.log(`  ✅ Portfolio analysis queued in background`);
+      } else {
+        console.log(`\n⏭️  No candidates with GitHub URLs to analyze`);
       }
 
       // Clean up temp files
@@ -479,7 +445,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       console.log(`\n✨ Upload pipeline complete!`);
 
-      updateProcessingStatus(jobId, 'complete', 'Upload and analysis complete');
+      // Only mark as complete if no background analysis is running
+      if (candidatesWithGithub.length === 0) {
+        updateProcessingStatus(jobId, 'complete', 'Upload complete');
+      } else {
+        updateProcessingStatus(
+          jobId,
+          'portfolio_analysis',
+          `Portfolio analysis running in background for ${candidatesWithGithub.length} candidates`
+        );
+      }
 
       // Calculate analysis stats
       const allCandidatesForJob = await prisma.candidate.findMany({
@@ -499,10 +474,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       return res.status(200).json({
         success: true,
-        message: `Successfully processed ${processedCandidates.length} candidates`,
+        message: `Successfully processed ${processedCandidates.length} candidates${candidatesWithGithub.length > 0 ? `. Portfolio analysis running in background for ${candidatesWithGithub.length} candidates.` : ''}`,
         processedCount: processedCandidates.length,
         analyzedCount: analyzedCandidatesCount,
         totalCandidatesForJob: allCandidatesForJob.length,
+        portfolioAnalysisQueued: candidatesWithGithub.length,
         errors: errors.length > 0 ? errors : undefined,
       });
     } catch (error: any) {

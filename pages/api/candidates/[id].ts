@@ -68,6 +68,7 @@ export default async function handler(
           linkedin: candidate.portfolio.linkedin,
           website: candidate.portfolio.website,
           analysisData: candidate.portfolio.analysisData,
+          analyzedAt: candidate.portfolio.analyzedAt,
           overallScore: candidate.portfolio.overallScore,
           resumeAlignment: candidate.portfolio.resumeAlignment,
           recommendation: candidate.portfolio.recommendation,
